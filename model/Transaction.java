@@ -1,6 +1,7 @@
 package model;
+
 public class Transaction {
-    private int id;
+    private int id; // Bạn nãy bị thiếu dòng này nè
     private double amount;
     private String category;
     private String note;
@@ -13,6 +14,7 @@ public class Transaction {
         this.note = note;
         this.date = date;
     }
+
     // Getters
     public int getId() { return id; }
     public double getAmount() { return amount; }
@@ -20,4 +22,3 @@ public class Transaction {
     public String getNote() { return note; }
     public String getDate() { return date; }
 }
-@

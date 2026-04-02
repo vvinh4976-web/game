@@ -1,12 +1,12 @@
 package controller;
 
-import model.Transaction;
-import utils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Transaction;
+import utils.DBConnection;
 
-/**
+/* 
  * Lớp TransactionController xử lý các nghiệp vụ liên quan đến giao dịch.
  * Thành phần 'Controller' trong mô hình MVC.
  */
