@@ -1,1 +1,19 @@
-/bin/
+# Bỏ qua file rác của Eclipse
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders/
+.project
+.classpath
+
+# Bỏ qua file rác của VS Code
+.vscode/
+.project
+.classpath
