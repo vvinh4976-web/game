@@ -1,43 +1,42 @@
 import java.awt.*;
 import java.sql.*;
+import java.util.Vector;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class QuanLyThuChi {
-    // Thông tin kết nối MySQL
     static final String URL = "jdbc:mysql://localhost:3306/db_quanlythuchi";
     static final String USER = "root";
     static final String PASS = "";
 
+    // Khai báo bảng ở ngoài để các hàm khác dùng chung
+    static DefaultTableModel tableModel;
+    static JTable table;
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Quản lý Thu chi - Nhóm 3");
-        frame.setSize(400, 300);
+        frame.setSize(600, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new GridLayout(5, 2, 10, 10));
+        frame.setLayout(new BorderLayout(10, 10));
 
-        // 1. Khai báo các thành phần
+        // --- PHẦN 1: PANEL NHẬP LIỆU (BÊN TRÊN) ---
+        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         JTextField txtAmount = new JTextField();
         JTextField txtCategory = new JTextField();
         JTextField txtNote = new JTextField();
         JButton btnAdd = new JButton("Lưu Giao Dịch");
 
-        // 2. PHẢI THÊM VÀO FRAME (Quan trọng nhất)
-        frame.add(new JLabel(" Số tiền:")); frame.add(txtAmount);
-        frame.add(new JLabel(" Loại chi tiêu:")); frame.add(txtCategory);
-        frame.add(new JLabel(" Ghi chú:")); frame.add(txtNote);
-        frame.add(new JLabel("")); frame.add(btnAdd);
+        inputPanel.add(new JLabel(" Số tiền:")); inputPanel.add(txtAmount);
+        inputPanel.add(new JLabel(" Loại chi tiêu:")); inputPanel.add(txtCategory);
+        inputPanel.add(new JLabel(" Ghi chú:")); inputPanel.add(txtNote);
+        inputPanel.add(new JLabel("")); inputPanel.add(btnAdd);
 
-        // 3. CHO HIỆN CỬA SỔ
-        frame.setVisible(true);
+        // --- PHẦN 2: BẢNG HIỂN THỊ (Ở GIỮA) ---
+        tableModel = new DefaultTableModel(new String[]{"ID", "Số tiền", "Loại", "Ghi chú", "Ngày"}, 0);
+        table = new JTable(tableModel);
+        loadData(); // Tải dữ liệu từ DB lên bảng ngay khi mở app
 
-        // Giữ nguyên đoạn try-catch kết nối DB của bạn ở dưới...
-    }
-
-        frame.add(new JLabel(" Số tiền:")); frame.add(txtAmount);
-        frame.add(new JLabel(" Loại (Ăn uống...):")); frame.add(txtCategory);
-        frame.add(new JLabel(" Ghi chú:")); frame.add(txtNote);
-        frame.add(new JLabel("")); frame.add(btnAdd);
-
-        // Sự kiện khi nhấn nút Lưu
+        // --- PHẦN 3: XỬ LÝ SỰ KIỆN ---
         btnAdd.addActionListener(e -> {
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS)) {
                 String sql = "INSERT INTO transactions (amount, category, note, transaction_date) VALUES (?, ?, ?, CURDATE())";
@@ -47,15 +46,39 @@ public class QuanLyThuChi {
                 pstmt.setString(3, txtNote.getText());
 
                 pstmt.executeUpdate();
-                JOptionPane.showMessageDialog(frame, "Đã lưu thành công vào Database!");
+                JOptionPane.showMessageDialog(frame, "Đã lưu thành công!");
                 
-                // Xóa trắng ô nhập sau khi lưu
                 txtAmount.setText(""); txtCategory.setText(""); txtNote.setText("");
+                loadData(); // Lưu xong thì tải lại bảng để cập nhật dòng mới
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Lỗi: " + ex.getMessage());
             }
         });
 
+        frame.add(inputPanel, BorderLayout.NORTH);
+        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    // Hàm lấy dữ liệu từ MySQL đổ vào JTable
+    public static void loadData() {
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASS)) {
+            tableModel.setRowCount(0); // Xóa bảng cũ
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM transactions ORDER BY transaction_date DESC");
+            
+            while (rs.next()) {
+                Vector<Object> row = new Vector<>();
+                row.add(rs.getInt("id"));
+                row.add(rs.getDouble("amount"));
+                row.add(rs.getString("category"));
+                row.add(rs.getString("note"));
+                row.add(rs.getDate("transaction_date"));
+                tableModel.addRow(row);
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi load bảng: " + e.getMessage());
+        }
     }
 }
