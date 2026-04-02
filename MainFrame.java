@@ -62,4 +62,27 @@ public class MainFrame extends JFrame {
     }
 
     public static void main(String[] args) { new MainFrame(); }
-}
+}JButton btnDelete = new JButton("Xóa giao dịch");
+btnDelete.setBackground(Color.RED); // Cho màu đỏ cho dễ sợ
+btnDelete.setForeground(Color.WHITE);
+// Thêm nút này vào panel hoặc một góc nào đó của frame
+pnlInput.add(btnDelete);
+btnDelete.addActionListener(e -> {
+    int selectedRow = table.getSelectedRow(); // Lấy dòng đang được chọn
+    if (selectedRow != -1) {
+        // Lấy ID ở cột đầu tiên (cột 0) của dòng đang chọn
+        int id = (int) table.getValueAt(selectedRow, 0);
+        
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc muốn xóa giao dịch ID: " + id + "?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+            
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (DatabaseHelper.delete(id)) {
+                JOptionPane.showMessageDialog(this, "Đã xóa thành công!");
+                refreshTable(); // Load lại bảng cho mới
+            }
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một dòng để xóa!");
+    }
+});
