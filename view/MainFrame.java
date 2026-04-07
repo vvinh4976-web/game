@@ -6,10 +6,18 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
-import org.jfree.chart.plot.RingPlot;
-
 import model.Transaction;
+
+// Các thư viện cần thiết cho JFreeChart và tùy chỉnh giao diện
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.plot.RingPlot;
+import org.jfree.data.general.DefaultPieDataset;
+import java.awt.BasicStroke;
+import java.text.NumberFormat;
+import java.util.Map;
 
 public class MainFrame extends JFrame {
     private JTextField txtAmount, txtCategory, txtNote;
@@ -26,7 +34,6 @@ public class MainFrame extends JFrame {
     }
 
     private void initUI() {
-        // Đã xóa Emoji để không bị lỗi ô vuông
         setTitle("Phan Mem Quan Ly Tai Chinh - Nhom Vinh, Hien, Y");
         setSize(950, 650);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -61,7 +68,7 @@ public class MainFrame extends JFrame {
 
         JButton btnAdd = new JButton("LUU GIAO DICH");
         btnAdd.setBackground(new Color(46, 204, 113)); 
-        btnAdd.setForeground(Color.BLACK); // Đã đổi thành màu ĐEN để hiện rõ chữ
+        btnAdd.setForeground(Color.BLACK);
         btnAdd.setFont(new Font("Arial", Font.BOLD, 14));
         inputPanel.add(btnAdd);
 
@@ -83,7 +90,7 @@ public class MainFrame extends JFrame {
         actionPanel.setBackground(new Color(240, 248, 255));
         JButton btnDelete = new JButton("XOA DONG CHON");
         btnDelete.setBackground(new Color(231, 76, 60)); 
-        btnDelete.setForeground(Color.BLACK); // Đã đổi thành màu ĐEN
+        btnDelete.setForeground(Color.BLACK);
         actionPanel.add(btnDelete);
         panelQuanLy.add(actionPanel, BorderLayout.SOUTH);
 
@@ -164,18 +171,12 @@ public class MainFrame extends JFrame {
         }
     }
 
-    // ================= HÀM VẼ BIỂU ĐỒ (Đã được dời ra ngoài đúng chuẩn) =================
-    // Import thêm mấy thư viện này ở đầu file MainFrame.java nhé:
-    // import java.awt.BasicStroke;
-    // import java.text.NumberFormat;
-    // import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
-    // import org.jfree.chart.plot.RingPlot;
-
-   private void updateChart() {
+    // ================= HÀM VẼ BIỂU ĐỒ DONUT =================
+    private void updateChart() {
         chartContainer.removeAll();
         
         // 1. Gọi hàm mới của Vinh để lấy dữ liệu đã gom nhóm
-        java.util.Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
+        Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
 
         if (categoryData.isEmpty()) {
             chartContainer.revalidate();
@@ -184,42 +185,41 @@ public class MainFrame extends JFrame {
         }
 
         // 2. Tự động nạp toàn bộ danh mục vào Dataset bằng vòng lặp
-        org.jfree.data.general.DefaultPieDataset dataset = new org.jfree.data.general.DefaultPieDataset();
-        for (java.util.Map.Entry<String, Double> entry : categoryData.entrySet()) {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
             dataset.setValue(entry.getKey(), entry.getValue());
         }
 
         // 3. Khởi tạo biểu đồ Donut (Ring Chart)
-        org.jfree.chart.JFreeChart chart = org.jfree.chart.ChartFactory.createRingChart(
+        JFreeChart chart = ChartFactory.createRingChart(
                 "PHAN TICH CHI TIEU", dataset, true, true, false); 
 
         // 4. "Độ" lại giao diện siêu mượt
-        org.jfree.chart.plot.RingPlot plot = (org.jfree.chart.plot.RingPlot) chart.getPlot();
+        RingPlot plot = (RingPlot) chart.getPlot();
         plot.setSectionDepth(0.30); 
         chart.setBackgroundPaint(Color.WHITE);
         plot.setBackgroundPaint(Color.WHITE);
         plot.setOutlineVisible(false); 
         plot.setShadowPaint(null);     
         plot.setSeparatorPaint(Color.WHITE);
-        plot.setSeparatorStroke(new java.awt.BasicStroke(4.0f)); 
+        plot.setSeparatorStroke(new BasicStroke(4.0f)); 
 
         // Tùy chỉnh Label (Hiển thị phần trăm %)
         plot.setLabelFont(new Font("SansSerif", Font.BOLD, 12));
         plot.setLabelBackgroundPaint(Color.WHITE); 
         plot.setLabelOutlinePaint(null); 
         plot.setLabelShadowPaint(null);  
-        plot.setLabelGenerator(new org.jfree.chart.labels.StandardPieSectionLabelGenerator(
-                "{0}: {2}", java.text.NumberFormat.getNumberInstance(), java.text.NumberFormat.getPercentInstance()
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
+                "{0}: {2}", NumberFormat.getNumberInstance(), NumberFormat.getPercentInstance()
         ));
 
         // 5. Đẩy lên Tab 2
-        org.jfree.chart.ChartPanel chartPanel = new org.jfree.chart.ChartPanel(chart);
+        ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setBackground(Color.WHITE);
         chartContainer.add(chartPanel, BorderLayout.CENTER);
         chartContainer.revalidate();
         chartContainer.repaint();
     }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
