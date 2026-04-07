@@ -65,7 +65,7 @@ public class MainFrame extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnDelete = new JButton("Xóa Dòng Chọn");
         btnDelete.setBackground(new Color(231, 76, 60));
-        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setForeground(Color.BLACK);
         actionPanel.add(btnDelete);
         add(actionPanel, BorderLayout.SOUTH);
 
