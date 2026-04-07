@@ -21,7 +21,7 @@ public class TransactionController {
         String sql = "SELECT * FROM transactions ORDER BY transaction_date DESC";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareCall(sql);
+           PreparedStatement pstmt = conn.prepareCall(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {

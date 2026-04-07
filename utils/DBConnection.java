@@ -3,7 +3,6 @@ package utils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
 /**
  * Lớp tiện ích để quản lý kết nối đến cơ sở dữ liệu MySQL.
  * Tuân thủ quy tắc đặt tên CamelCase và có comment giải thích.
