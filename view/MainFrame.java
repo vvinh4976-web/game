@@ -288,4 +288,4 @@ public class MainFrame extends JFrame {
         try { UIManager.setLookAndFeel(new FlatDarkLaf()); } catch (Exception e) {}
         SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
-}
+} // ok ends
