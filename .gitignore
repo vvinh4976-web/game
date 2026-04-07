@@ -1,0 +1,9 @@
+# Chặn thư mục cấu hình của VS Code
+.vscode/
+
+# Chặn thư mục chứa file đã biên dịch (file .class)
+bin/
+
+# Chặn các file rác khác
+*.class
+.DS_Store
