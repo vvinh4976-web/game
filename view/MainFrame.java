@@ -49,7 +49,7 @@ public class MainFrame extends JFrame {
 
         JButton btnAdd = new JButton("Lưu Giao Dịch");
         btnAdd.setBackground(new Color(46, 204, 113));
-        btnAdd.setForeground(Color.WHITE);
+        btnAdd.setForeground(Color.black);
         inputPanel.add(new JLabel("")); // Khoảng trống
         inputPanel.add(btnAdd);
 
