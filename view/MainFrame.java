@@ -6,6 +6,9 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import org.jfree.chart.plot.RingPlot;
+
 import model.Transaction;
 
 public class MainFrame extends JFrame {
@@ -162,9 +165,16 @@ public class MainFrame extends JFrame {
     }
 
     // ================= HÀM VẼ BIỂU ĐỒ (Đã được dời ra ngoài đúng chuẩn) =================
+    // Import thêm mấy thư viện này ở đầu file MainFrame.java nhé:
+    // import java.awt.BasicStroke;
+    // import java.text.NumberFormat;
+    // import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+    // import org.jfree.chart.plot.RingPlot;
+
     private void updateChart() {
         chartContainer.removeAll();
         
+        // --- 1. LẤY DỮ LIỆU TỪ CONTROLLER ---
         double[] summary = controller.getSummaryData();
         double totalThu = summary[0];
         double totalChi = summary[1];
@@ -175,18 +185,56 @@ public class MainFrame extends JFrame {
             return;
         }
 
+        // --- 2. TẠO DATASET ---
         org.jfree.data.general.DefaultPieDataset dataset = new org.jfree.data.general.DefaultPieDataset();
-        dataset.setValue("Tong Thu", totalThu);
-        dataset.setValue("Tong Chi", totalChi);
+        // Sau này bạn có thể đổi logic để truyền nhiều danh mục hơn vào đây
+        dataset.setValue("Ăn uống & Chi tiêu", totalChi);
+        dataset.setValue("Thu nhập & Lương", totalThu);
 
-        org.jfree.chart.JFreeChart pieChart = org.jfree.chart.ChartFactory.createPieChart(
-                "BIEU DO TY LE THU CHI", dataset, true, true, false);
+        // --- 3. KHỞI TẠO BIỂU ĐỒ DONUT (RING CHART) ---
+        org.jfree.chart.JFreeChart chart = org.jfree.chart.ChartFactory.createRingChart(
+                "TÌNH HÌNH THU CHI", dataset, false, true, false); // Tắt phần Legend (chú thích ô vuông rườm rà)
 
-        org.jfree.chart.ChartPanel chartPanel = new org.jfree.chart.ChartPanel(pieChart);
-        chartContainer.add(chartPanel, java.awt.BorderLayout.CENTER);
+        // --- 4. "ĐỘ" LẠI GIAO DIỆN SIÊU ĐẸP ---
+        RingPlot plot = (RingPlot) chart.getPlot();
         
+        // Độ dày của vòng bánh (0.30 là chuẩn tỉ lệ đẹp)
+        plot.setSectionDepth(0.30); 
+        
+        // GIAO DIỆN NỀN: Trắng muốt, không viền, không bóng mờ (Quan trọng nhất)
+        chart.setBackgroundPaint(Color.WHITE);
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setOutlineVisible(false); // Bỏ viền vuông ngoài cùng
+        plot.setShadowPaint(null);     // Bỏ bóng đen 3D cũ kỹ
+        
+        // TẠO KHE HỞ: Tạo khoảng trắng mỏng giữa các múi
+        plot.setSeparatorPaint(Color.WHITE);
+        plot.setSeparatorStroke(new BasicStroke(4.0f)); 
+        
+        // MÀU SẮC: Set màu sắc thủ công theo phong cách Pastel giống ảnh
+        plot.setSectionPaint("Ăn uống & Chi tiêu", Color.decode("#FFB142")); // Màu cam vàng
+        plot.setSectionPaint("Thu nhập & Lương", Color.decode("#33D9B2")); // Màu xanh ngọc
+        // Nếu sau này Ý thêm Dataset "Người thân", "Mua sắm", cứ thêm dòng plot.setSectionPaint(...) và đổi mã màu Hex là được.
+
+        // TÙY CHỈNH CHỮ (LABEL) CHO THANH MẢNH
+        plot.setLabelFont(new Font("SansSerif", Font.BOLD, 12));
+        plot.setLabelBackgroundPaint(Color.WHITE); 
+        plot.setLabelOutlinePaint(null); // Bỏ viền khung chữ
+        plot.setLabelShadowPaint(null);  // Bỏ bóng khung chữ
+        plot.setLabelLinkPaint(Color.LIGHT_GRAY); // Chỉnh đường kẻ nối ra màu xám nhạt
+        
+        // Hiển thị chữ theo format: "Tên Danh Mục: 50%"
+        plot.setLabelGenerator(new org.jfree.chart.labels.StandardPieSectionLabelGenerator(
+                "{0}: {2}", java.text.NumberFormat.getNumberInstance(), java.text.NumberFormat.getPercentInstance()
+        ));
+
+        // --- 5. ĐẨY LÊN GIAO DIỆN ---
+        org.jfree.chart.ChartPanel chartPanel = new org.jfree.chart.ChartPanel(chart);
+        chartPanel.setBackground(Color.WHITE);
+        
+        chartContainer.add(chartPanel, BorderLayout.CENTER);
         chartContainer.revalidate();
-        chartContainer.repaint(); 
+        chartContainer.repaint();
     }
 
     public static void main(String[] args) {

@@ -2,7 +2,9 @@ package controller;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Transaction;
 import utils.DBConnection;
 
@@ -101,5 +103,30 @@ public class TransactionController {
             }
         }
         return new double[]{totalThu, totalChi};
+    }
+    /**
+     * Hàm lấy dữ liệu gom nhóm theo từng Danh mục để Ý vẽ biểu đồ Donut nhiều màu.
+     * Hàm này sẽ tự động phân tích: Ví dụ có 3 khoản "Ăn uống" nó sẽ tự cộng dồn lại thành 1 cục.
+     * @return Map chứa Tên danh mục và Tổng tiền của danh mục đó
+     */
+    public Map<String, Double> getExpenseSummaryByCategory() {
+        Map<String, Double> summary = new HashMap<>();
+        List<Transaction> list = getAllTransactions();
+
+        for (Transaction t : list) {
+            String cat = t.getCategory().toLowerCase();
+            
+            // Tạm thời bỏ qua các khoản Thu (Lương, Thưởng...) để biểu đồ chỉ phân tích Chi Tiêu (như app mẫu)
+            if (cat.contains("lương") || cat.contains("thu") || cat.contains("thưởng")) {
+                continue; 
+            }
+
+            // Tên danh mục gốc do người dùng nhập
+            String categoryName = t.getCategory(); 
+            
+            // Cộng dồn tiền: Nếu danh mục đã có thì cộng thêm, chưa có thì gán bằng số tiền hiện tại
+            summary.put(categoryName, summary.getOrDefault(categoryName, 0.0) + t.getAmount());
+        }
+        return summary;
     }
 }
