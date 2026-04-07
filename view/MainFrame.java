@@ -19,7 +19,7 @@ public class MainFrame extends JFrame {
         controller = new TransactionController();
         initUI();
         loadDataToTable();
-        updateChart(); // Gọi biểu đồ ngay khi mở app
+        updateChart(); 
     }
 
     private void initUI() {
