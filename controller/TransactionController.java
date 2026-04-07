@@ -82,4 +82,23 @@ public class TransactionController {
             return false;
         }
     }
+    /**
+     * Hàm lấy dữ liệu để vẽ biểu đồ (Dành cho Ý)
+     * Giả sử: Danh mục "Lương" hoặc "Thưởng" là THU. Còn lại là CHI.
+     */
+    public double[] getSummaryData() {
+        double totalThu = 0;
+        double totalChi = 0;
+        
+        List<Transaction> list = getAllTransactions();
+        for (Transaction t : list) {
+            // Logic đơn giản: Nếu Category chứa chữ Lương hoặc Thu thì cộng vào Tổng Thu
+            if (t.getCategory().toLowerCase().contains("lương") || t.getCategory().toLowerCase().contains("thu")) {
+                totalThu += t.getAmount();
+            } else {
+                totalChi += t.getAmount(); // Còn lại tính là Chi
+            }
+        }
+        return new double[]{totalThu, totalChi};
+    }
 }
