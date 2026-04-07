@@ -6,8 +6,7 @@ import java.util.List;
 import model.Transaction;
 import utils.DBConnection;
 
-/* 
- * Lớp TransactionController xử lý các nghiệp vụ liên quan đến giao dịch.
+/* * Lớp TransactionController xử lý các nghiệp vụ liên quan đến giao dịch.
  * Thành phần 'Controller' trong mô hình MVC.
  */
 public class TransactionController {
@@ -20,8 +19,9 @@ public class TransactionController {
         List<Transaction> list = new ArrayList<>();
         String sql = "SELECT * FROM transactions ORDER BY transaction_date DESC";
 
+        // Đã sửa lại thành prepareStatement ở dòng dưới đây:
         try (Connection conn = DBConnection.getConnection();
-           PreparedStatement pstmt = conn.prepareCall(sql);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
@@ -82,6 +82,7 @@ public class TransactionController {
             return false;
         }
     }
+
     /**
      * Hàm lấy dữ liệu để vẽ biểu đồ (Dành cho Ý)
      * Giả sử: Danh mục "Lương" hoặc "Thưởng" là THU. Còn lại là CHI.
