@@ -4,15 +4,14 @@ Dự án đồ án môn học Lập trình Java Swing & Hệ quản trị CSDL M
 **🔗 [Link Video Demo Hướng Dẫn Sử Dụng trên YouTube](Dán_link_youtube_của_nhóm_vào_đây)**
 
 ---
-
-## 🚀 Tính năng nổi bật
-* **Hệ thống Bảo mật:** Xác thực người dùng với màn hình Đăng nhập/Đăng ký an toàn.
-* **Dashboard Thống kê:** Tự động tính toán và hiển thị tổng số giao dịch & tổng tiền theo thời gian thực.
-* **Quản lý Thu Chi:** Thêm mới, xóa và liệt kê các khoản giao dịch.
-* **Tìm kiếm Thông minh (Live Search):** Lọc dữ liệu tức thì ngay khi gõ từ khóa.
-* **Biểu đồ Trực quan:** Phân tích chi tiêu qua biểu đồ Donut (JFreeChart) tích hợp hiệu ứng hoạt ảnh (Animation) xoay 360 độ và bảng màu Pastel.
-* **Giao diện Hiện đại:** Sử dụng Dark Theme (FlatLaf) bảo vệ mắt, tối ưu UI/UX với hiệu ứng Hover mượt mà.
-
+## ✨ Các chức năng chính (Features)
+- [x] Quản lý thông tin (Thêm, Xóa, Liệt kê dữ liệu) tích hợp thanh tìm kiếm thông minh **Live Search**.
+- [x] Lưu trữ dữ liệu vĩnh viễn với Cơ sở dữ liệu MySQL an toàn.
+- [x] Giao diện người dùng (GUI) thân thiện, thiết kế **Dark Theme** hiện đại bằng thư viện FlatLaf cùng hiệu ứng Hover mượt mà.
+- [x] Bắt lỗi nhập liệu chặt chẽ (Exception Handling) và cảnh báo trực quan.
+- [x] **[Tính năng nổi bật 1]: Trực quan hóa dữ liệu chi tiêu bằng Biểu đồ Donut (JFreeChart) tùy biến màu Pastel và tích hợp hiệu ứng hoạt ảnh (Animation) xoay 360 độ.**
+- [x] **[Tính năng nổi bật 2]: Hệ thống Cố vấn Tài chính Thông minh: Tự động phân bổ ngân sách (Quy tắc 50/30/20), cảnh báo rủi ro chi tiêu âm tiền và dự báo tích lũy lãi kép trong tương lai.**
+- [x] **[Tính năng nổi bật 3]: Hệ thống Đăng nhập (Login) an toàn, hỗ trợ nhận diện nhiều người dùng (Vinh, Hiền, Ý) với lời chào cá nhân hóa.**
 ---
 
 ## 🛠 Công nghệ & Yêu cầu hệ thống
