@@ -7,7 +7,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
@@ -189,7 +188,7 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void updateChart() {
+  private void updateChart() {
         Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
         if (categoryData.isEmpty()) {
             chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return;
@@ -210,6 +209,14 @@ public class MainFrame extends JFrame {
         plot.setSeparatorPaint(COLOR_BG); 
         plot.setSeparatorStroke(new BasicStroke(5.0f)); 
         
+        // --- PHẦN CODE MÀU SẮC BỊ THIẾU ĐÃ ĐƯỢC THÊM LẠI VÀO ĐÂY ---
+        plot.setSectionPaint("an uong", Color.decode("#FFB142")); // Vàng cam
+        plot.setSectionPaint("mua sam", Color.decode("#33D9B2")); // Xanh ngọc
+        plot.setSectionPaint("giai tri", Color.decode("#FF5252")); // Đỏ nhạt
+        plot.setSectionPaint("hoa don", Color.decode("#34ACE0")); // Xanh dương
+        plot.setSectionPaint("di lai", Color.decode("#D980FA"));  // Tím nhạt
+        // -----------------------------------------------------------
+
         plot.setLabelFont(new Font("Segoe UI", Font.BOLD, 13));
         plot.setLabelPaint(COLOR_TEXT); 
         plot.setLabelBackgroundPaint(COLOR_BG); 
@@ -238,7 +245,6 @@ public class MainFrame extends JFrame {
         });
         chartTimer.start(); 
     }
-
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(new FlatDarkLaf()); } catch (Exception e) {}
         // LỖI Ở ĐÂY: Phải là setVisible(true) - viết thường toàn bộ
