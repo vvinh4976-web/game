@@ -1,26 +1,42 @@
-# 💰 Phần Mềm Quản Lý Tài Chính Cá Nhân
+# 💰 Phần Mềm Quản Lý Tài Chính Cá Nhân Pro
 
-Dự án đồ án môn học Java Swing & MySQL của nhóm: **Vinh - Hiền - Ý**.
+Dự án đồ án môn học Lập trình Java Swing & Hệ quản trị CSDL MySQL.
+**🔗 [Link Video Demo Hướng Dẫn Sử Dụng trên YouTube](Dán_link_youtube_của_nhóm_vào_đây)**
+
+---
 
 ## 🚀 Tính năng nổi bật
-* **Quản lý giao dịch:** Thêm, xóa, liệt kê các khoản thu chi.
-* **Biểu đồ thông minh:** Phân tích chi tiêu qua biểu đồ Donut (JFreeChart) có hiệu ứng xoay.
-* **Giao diện hiện đại:** Dark Theme sử dụng thư viện FlatLaf, hỗ trợ hiệu ứng Hover.
+* **Hệ thống Bảo mật:** Xác thực người dùng với màn hình Đăng nhập/Đăng ký an toàn.
+* **Dashboard Thống kê:** Tự động tính toán và hiển thị tổng số giao dịch & tổng tiền theo thời gian thực.
+* **Quản lý Thu Chi:** Thêm mới, xóa và liệt kê các khoản giao dịch.
+* **Tìm kiếm Thông minh (Live Search):** Lọc dữ liệu tức thì ngay khi gõ từ khóa.
+* **Biểu đồ Trực quan:** Phân tích chi tiêu qua biểu đồ Donut (JFreeChart) tích hợp hiệu ứng hoạt ảnh (Animation) xoay 360 độ và bảng màu Pastel.
+* **Giao diện Hiện đại:** Sử dụng Dark Theme (FlatLaf) bảo vệ mắt, tối ưu UI/UX với hiệu ứng Hover mượt mà.
 
-## 🛠 Yêu cầu hệ thống
-* Java JDK 17+
-* MySQL Server (XAMPP)
-* Các thư viện (nằm trong thư mục /lib):
-  * `mysql-connector-java-*.jar`
-  * `jfreechart-*.jar`
-  * `flatlaf-*.jar`
+---
 
-## 📦 Hướng dẫn cài đặt
-1. **Database:** Import file `database.sql` vào phpMyAdmin.
-2. **Thư viện:** Add toàn bộ file .jar trong thư mục `lib` vào `Referenced Libraries`.
-3. **Chạy ứng dụng:** Chạy file `view/MainFrame.java`.
+## 🛠 Công nghệ & Yêu cầu hệ thống
+* **Ngôn ngữ:** Java (JDK 17+)
+* **Cơ sở dữ liệu:** MySQL Server (XAMPP / MySQL Workbench)
+* **Kiến trúc:** Mô hình MVC (Model - View - Controller)
+* **Thư viện tích hợp (nằm trong thư mục `/lib`):**
+  * `mysql-connector-java-*.jar`: Kết nối CSDL.
+  * `jfreechart-*.jar`: Vẽ biểu đồ thống kê.
+  * `flatlaf-*.jar`: Render giao diện Dark Theme.
 
-## 👥 Thành viên thực hiện
-* **Vinh:** Backend & Database
-* **Hiền:** UI/UX Design
-* **Ý:** Data Visualization & Animation
+---
+
+## 📦 Hướng dẫn cài đặt & Chạy dự án
+1. **Khởi tạo Database:** * Mở XAMPP, bật Apache và MySQL.
+   * Truy cập `localhost/phpmyadmin` và import file `database.sql` đi kèm.
+2. **Cấu hình Thư viện:** * Mở dự án bằng VS Code (hoặc Eclipse/IntelliJ).
+   * Thêm toàn bộ các file `.jar` trong thư mục `lib` vào **Referenced Libraries** (hoặc Build Path).
+3. **Khởi chạy Ứng dụng:** * Mở file **`Main.java`** (Nằm ở thư mục gốc, KHÔNG chạy trong thư mục view).
+   * Ấn **Run** để khởi động màn hình Đăng nhập.
+
+---
+
+## 👥 Đội ngũ Phát triển
+* **Vinh:** Backend Architecture, Xử lý Logic (Controller) & Thiết kế Cơ sở dữ liệu (MySQL).
+* **Hiền:** UI/UX Design, Tích hợp FlatLaf & Tối ưu trải nghiệm người dùng (Frontend).
+* **Ý:** Data Visualization (JFreeChart), Xử lý Hoạt ảnh (Animation) & Live Search.

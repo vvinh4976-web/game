@@ -11,7 +11,7 @@ public class LoginFrame extends JFrame {
 
     public LoginFrame() {
         setTitle("Đăng Nhập - Hệ Thống Quản Lý Tài Chính");
-        setSize(400, 360); // Nới rộng xíu để chứa thêm nút Đăng ký
+        setSize(400, 360); 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -30,17 +30,20 @@ public class LoginFrame extends JFrame {
         formPanel.setBackground(new Color(18, 18, 18));
 
         JLabel lblUser = new JLabel("Tên đăng nhập:"); lblUser.setForeground(Color.WHITE); lblUser.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        txtUsername = new JTextField(); txtUsername.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập: admin");
+        txtUsername = new JTextField(); 
+        // Đổi chữ gợi ý cho ngầu
+        txtUsername.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập tài khoản ");
 
         JLabel lblPass = new JLabel("Mật khẩu:"); lblPass.setForeground(Color.WHITE); lblPass.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        txtPassword = new JPasswordField(); txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập: 123456");
+        txtPassword = new JPasswordField(); 
+        txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập mật khẩu...");
 
         formPanel.add(lblUser); formPanel.add(txtUsername);
         formPanel.add(lblPass); formPanel.add(txtPassword);
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        // --- KHU VỰC NÚT BẤM (Cập nhật thêm nút Đăng ký) ---
-        JPanel bottomPanel = new JPanel(new GridLayout(2, 1, 0, 10)); // Chia làm 2 dòng
+        // --- KHU VỰC NÚT BẤM ---
+        JPanel bottomPanel = new JPanel(new GridLayout(2, 1, 0, 10)); 
         bottomPanel.setBackground(new Color(18, 18, 18));
         bottomPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
 
@@ -59,9 +62,8 @@ public class LoginFrame extends JFrame {
 
         btnPanel.add(btnLogin); btnPanel.add(btnExit);
 
-        // Nút chuyển sang trang Đăng Ký
         JButton btnGoRegister = new JButton("Chưa có tài khoản? Đăng ký ngay");
-        btnGoRegister.setContentAreaFilled(false); // Xóa viền nút để nhìn giống Text Link
+        btnGoRegister.setContentAreaFilled(false); 
         btnGoRegister.setForeground(new Color(52, 172, 224));
         btnGoRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnGoRegister.setBorderPainted(false);
@@ -72,14 +74,32 @@ public class LoginFrame extends JFrame {
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
         add(mainPanel);
 
-        // ================= XỬ LÝ SỰ KIỆN =================
+        // ================= XỬ LÝ SỰ KIỆN NÚT BẤM =================
         btnExit.addActionListener(e -> System.exit(0));
 
         btnLogin.addActionListener(e -> {
-            String user = txtUsername.getText();
+            // Lấy dữ liệu người dùng nhập
+            String user = txtUsername.getText().trim();
             String pass = new String(txtPassword.getPassword());
-            if (user.equals("admin") && pass.equals("123456")) {
-                JOptionPane.showMessageDialog(this, "Đăng nhập thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+            boolean isSuccess = false;
+            String displayName = "";
+
+            // --- KIỂM TRA TÀI KHOẢN NHIỀU NGƯỜI (Bỏ qua viết hoa/thường) ---
+            if (user.equalsIgnoreCase("Vinh") && pass.equals("12345")) {
+                isSuccess = true; displayName = "Vinh";
+            } else if (user.equalsIgnoreCase("Hien") && pass.equals("12345")) {
+                isSuccess = true; displayName = "Hiền";
+            } else if (user.equalsIgnoreCase("Y") && pass.equals("12345")) {
+                isSuccess = true; displayName = "Ý";
+            } else if (user.equalsIgnoreCase("admin") && pass.equals("123456")) {
+                isSuccess = true; displayName = "Admin";
+            }
+
+            // --- KẾT QUẢ ĐĂNG NHẬP ---
+            if (isSuccess) {
+                // Hiện thông báo chào mừng tên riêng
+                JOptionPane.showMessageDialog(this, "Xin chào " + displayName + "! Đăng nhập thành công.", "Chào mừng", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose(); 
                 SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
             } else {
@@ -88,10 +108,10 @@ public class LoginFrame extends JFrame {
             }
         });
 
-        // SỰ KIỆN MỞ TRANG ĐĂNG KÝ
+        // Mở trang Đăng Ký
         btnGoRegister.addActionListener(e -> {
-            this.dispose(); // Đóng trang Login
-            SwingUtilities.invokeLater(() -> new RegisterFrame().setVisible(true)); // Mở trang Register
+            this.dispose(); 
+            SwingUtilities.invokeLater(() -> new RegisterFrame().setVisible(true)); 
         });
     }
 }
