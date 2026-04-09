@@ -1,18 +1,21 @@
-import view.MainFrame;
+import view.LoginFrame; // Đổi import sang LoginFrame
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import com.formdev.flatlaf.FlatDarkLaf;
+
 public class Main {
     public static void main(String[] args) {
+        // 1. Cài đặt giao diện Dark Theme
         try {
             UIManager.setLookAndFeel(new FlatDarkLaf());
         } catch (Exception e) {
             System.err.println("Loi khoi tao FlatLaf");
         }
-        // 2. Khởi động màn hình chính
+
+        // 2. KHỞI ĐỘNG MÀN HÌNH ĐĂNG NHẬP TRƯỚC
         SwingUtilities.invokeLater(() -> {
-            MainFrame app = new MainFrame();
-            app.setVisible(true);
+            LoginFrame login = new LoginFrame();
+            login.setVisible(true);
         });
     }
 }
