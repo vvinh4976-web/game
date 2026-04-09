@@ -1,22 +1,22 @@
 package view;
 
 import controller.TransactionController;
+import model.Transaction;
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.Timer; // Thêm thư viện Timer cho Animation
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import model.Transaction;
 
-// Import thư viện FlatLaf
+// Thư viện giao diện FlatLaf
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 
-// Import thư viện JFreeChart
+// Thư viện biểu đồ JFreeChart
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -30,10 +30,8 @@ public class MainFrame extends JFrame {
     private DefaultTableModel tableModel;
     private TransactionController controller;
     private JPanel chartContainer; 
-    
-    private Timer chartTimer; // Biến điều khiển hoạt ảnh biểu đồ
+    private Timer chartTimer;
 
-    // ĐỊNH NGHĨA BẢNG MÀU DARK THEME
     private final Color COLOR_BG = new Color(18, 18, 18); 
     private final Color COLOR_PANEL_BG = new Color(30, 30, 30); 
     private final Color COLOR_TEXT = new Color(240, 240, 240); 
@@ -67,7 +65,6 @@ public class MainFrame extends JFrame {
         panelQuanLy.setBorder(new EmptyBorder(15, 15, 15, 15));
         panelQuanLy.setBackground(COLOR_BG); 
 
-        // 1. Form nhập liệu
         JPanel inputPanel = new JPanel(new GridLayout(2, 4, 15, 15));
         inputPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Color.GRAY), " Nhap Giao Dich Moi ", 
@@ -78,10 +75,8 @@ public class MainFrame extends JFrame {
         
         inputPanel.add(createLabel(" So tien (VND):", labelFont));
         txtAmount = new JTextField(); inputPanel.add(txtAmount);
-
         inputPanel.add(createLabel(" Danh muc:", labelFont));
         txtCategory = new JTextField(); inputPanel.add(txtCategory);
-
         inputPanel.add(createLabel(" Ghi chu:", labelFont));
         txtNote = new JTextField(); inputPanel.add(txtNote);
 
@@ -89,8 +84,7 @@ public class MainFrame extends JFrame {
         btnAdd.setBackground(COLOR_ACCENT_GREEN); 
         btnAdd.setForeground(Color.BLACK); 
         btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnAdd.putClientProperty(FlatClientProperties.STYLE, "" +
-                "arc: 10; borderWidth: 0; hoverBackground: #27ae60; pressedBackground: #1e8449;");
+        btnAdd.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0; hoverBackground: #27ae60; pressedBackground: #1e8449;");
         inputPanel.add(btnAdd);
         panelQuanLy.add(inputPanel, BorderLayout.NORTH);
 
@@ -99,7 +93,7 @@ public class MainFrame extends JFrame {
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
         
-        // --- Hiệu ứng Hover cho bảng ---
+        // Hiệu ứng Hover cho bảng
         table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             int lastHoveredRow = -1;
             public void mouseMoved(java.awt.event.MouseEvent e) {
@@ -125,14 +119,9 @@ public class MainFrame extends JFrame {
         });
 
         table.setRowHeight(28);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(50, 50, 50)); 
-        table.getTableHeader().setForeground(COLOR_TEXT); 
         table.setBackground(COLOR_PANEL_BG); 
         table.setForeground(COLOR_TEXT); 
         table.setShowGrid(false); 
-        table.setIntercellSpacing(new Dimension(0, 5)); 
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new LineBorder(new Color(60, 60, 60))); 
@@ -141,13 +130,11 @@ public class MainFrame extends JFrame {
         // 3. Nút Xóa
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         actionPanel.setBackground(COLOR_BG);
-        
         JButton btnDelete = new JButton("XOA DONG CHON");
         btnDelete.setBackground(COLOR_ACCENT_RED); 
         btnDelete.setForeground(Color.WHITE); 
         btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnDelete.putClientProperty(FlatClientProperties.STYLE, "" +
-                "arc: 10; borderWidth: 0; hoverBackground: #e86558; pressedBackground: #ff7669;");
+        btnDelete.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0; hoverBackground: #e86558; pressedBackground: #ff7669;");
         actionPanel.add(btnDelete);
         panelQuanLy.add(actionPanel, BorderLayout.SOUTH);
 
@@ -155,12 +142,8 @@ public class MainFrame extends JFrame {
         JPanel panelThongKe = new JPanel(new BorderLayout());
         chartContainer = new JPanel(new BorderLayout()); 
         chartContainer.setBackground(COLOR_BG); 
-        
         JButton btnRefreshChart = new JButton("Lam moi bieu do");
-        btnRefreshChart.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnRefreshChart.putClientProperty(FlatClientProperties.STYLE, "arc: 5;");
         btnRefreshChart.addActionListener(e -> updateChart()); 
-
         panelThongKe.add(btnRefreshChart, BorderLayout.NORTH);
         panelThongKe.add(chartContainer, BorderLayout.CENTER);
 
@@ -168,24 +151,16 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Bieu Do Thong Ke", panelThongKe);
         add(tabbedPane);
 
-        // ================= XỬ LÝ SỰ KIỆN =================
         btnAdd.addActionListener(e -> {
             try {
                 if (txtAmount.getText().isEmpty() || txtCategory.getText().isEmpty()) throw new Exception("Khong duoc de trong!");
                 double amount = Double.parseDouble(txtAmount.getText());
-                if (amount <= 0) throw new Exception("So tien phai lon hon 0!");
-
                 Transaction t = new Transaction(0, amount, txtCategory.getText(), txtNote.getText(), "");
                 if (controller.addTransaction(t)) {
                     JOptionPane.showMessageDialog(null, "Luu thanh cong!");
                     txtAmount.setText(""); txtCategory.setText(""); txtNote.setText("");
-                    loadDataToTable(); 
-                    updateChart(); 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Loi he thong, khong the luu!", "Loi", JOptionPane.ERROR_MESSAGE);
+                    loadDataToTable(); updateChart(); 
                 }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Chi duoc nhap so!", "Loi", JOptionPane.WARNING_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Loi", JOptionPane.WARNING_MESSAGE);
             }
@@ -199,8 +174,6 @@ public class MainFrame extends JFrame {
                         loadDataToTable(); updateChart();
                     }
                 }
-            } else {
-                JOptionPane.showMessageDialog(null, "Vui long chon 1 dong!");
             }
         });
     }
@@ -216,21 +189,15 @@ public class MainFrame extends JFrame {
         }
     }
 
-    // ================= HÀM VẼ BIỂU ĐỒ DONUT (ANIMATION + FIX TITLE) =================
     private void updateChart() {
         Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
         if (categoryData.isEmpty()) {
             chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return;
         }
-
         DefaultPieDataset dataset = new DefaultPieDataset();
-        for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
-            dataset.setValue(entry.getKey(), entry.getValue());
-        }
+        for (Map.Entry<String, Double> entry : categoryData.entrySet()) dataset.setValue(entry.getKey(), entry.getValue());
 
         JFreeChart chart = ChartFactory.createRingChart("PHAN TICH CHI TIEU", dataset, false, true, false); 
-        
-        // FIX LỖI: Sửa màu tiêu đề thành màu trắng sáng
         chart.getTitle().setPaint(COLOR_TEXT);
         chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 18));
 
@@ -243,20 +210,12 @@ public class MainFrame extends JFrame {
         plot.setSeparatorPaint(COLOR_BG); 
         plot.setSeparatorStroke(new BasicStroke(5.0f)); 
         
-        plot.setSectionPaint("an uong", Color.decode("#FFB142")); 
-        plot.setSectionPaint("mua sam", Color.decode("#33D9B2")); 
-        plot.setSectionPaint("giai tri", Color.decode("#FF5252")); 
-        plot.setSectionPaint("hoa don", Color.decode("#34ACE0")); 
-        plot.setSectionPaint("di lai", Color.decode("#D980FA"));  
-        
         plot.setLabelFont(new Font("Segoe UI", Font.BOLD, 13));
         plot.setLabelPaint(COLOR_TEXT); 
         plot.setLabelBackgroundPaint(COLOR_BG); 
         plot.setLabelOutlinePaint(null); 
         plot.setLabelShadowPaint(null);  
-        plot.setLabelLinkPaint(new Color(150, 150, 150)); 
 
-        // --- ANIMATION CHUYỂN ĐỘNG XOAY ---
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setBackground(COLOR_BG); 
         chartContainer.removeAll();
@@ -264,20 +223,16 @@ public class MainFrame extends JFrame {
         chartContainer.revalidate();
         
         if (chartTimer != null && chartTimer.isRunning()) chartTimer.stop();
-        
         final double[] currentAngle = {0.0}; 
-        plot.setLabelGenerator(null); // Giấu nhãn khi đang xoay
+        plot.setLabelGenerator(null); 
 
         chartTimer = new Timer(15, e -> { 
             currentAngle[0] += 5.0; 
             plot.setStartAngle(currentAngle[0]);
             chartPanel.repaint();
-            
             if (currentAngle[0] >= 360.0) {
                 ((Timer) e.getSource()).stop();
-                plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
-                    "{0}: {2}", NumberFormat.getNumberInstance(), NumberFormat.getPercentInstance()
-                ));
+                plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}: {2}", NumberFormat.getNumberInstance(), NumberFormat.getPercentInstance()));
                 chartPanel.repaint(); 
             }
         });
@@ -286,6 +241,7 @@ public class MainFrame extends JFrame {
 
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(new FlatDarkLaf()); } catch (Exception e) {}
-        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(True));
+        // LỖI Ở ĐÂY: Phải là setVisible(true) - viết thường toàn bộ
+        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
-} // ok ends
+}
