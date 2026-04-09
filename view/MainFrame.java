@@ -245,9 +245,4 @@ public class MainFrame extends JFrame {
         });
         chartTimer.start(); 
     }
-    public static void main(String[] args) {
-        try { UIManager.setLookAndFeel(new FlatDarkLaf()); } catch (Exception e) {}
-        // LỖI Ở ĐÂY: Phải là setVisible(true) - viết thường toàn bộ
-        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
-    }
 }
