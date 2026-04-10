@@ -109,8 +109,7 @@ public class TransactionController {
 
         for (Transaction t : list) {
             String cat = t.getCategory().toLowerCase();
-            
-            // Tạm thời bỏ qua các khoản Thu (Lương, Thưởng...) để biểu đồ chỉ phân tích Chi Tiêu (như app mẫu)
+            // bỏ qua các lương thu thưởng để chỉ tập trung vào chi tiêu 
             if (cat.contains("lương") || cat.contains("thu") || cat.contains("thưởng")) {
                 continue; 
             }

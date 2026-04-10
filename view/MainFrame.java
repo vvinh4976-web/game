@@ -42,6 +42,7 @@ public class MainFrame extends JFrame {
     private double currentTotalExpense = 0; 
     private double currentTotalIncome = 0;
 
+    // 👉 [PHẦN CỦA HIỀN]: Khai báo các mã màu Custom cho giao diện Dark Theme
     private final Color COLOR_BG = new Color(18, 18, 18); 
     private final Color COLOR_PANEL_BG = new Color(30, 30, 30); 
     private final Color COLOR_TEXT = new Color(240, 240, 240); 
@@ -50,8 +51,12 @@ public class MainFrame extends JFrame {
     private final Color COLOR_ACCENT_BLUE = new Color(52, 172, 224);
 
     public MainFrame() {
+        // 👉 [PHẦN CỦA VINH]: Khởi tạo Controller để kết nối Database
         controller = new TransactionController();
+        
+        // 👉 [PHẦN CỦA HIỀN]: Áp dụng giao diện FlatDarkLaf trước khi load UI
         try { UIManager.setLookAndFeel(new FlatDarkLaf()); } catch (Exception ex) {}
+        
         initUI();
         loadDataToTable();
         updateChart(); 
@@ -67,6 +72,7 @@ public class MainFrame extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 14));
 
+        // 👉 [PHẦN CỦA HIỀN]: Thiết kế Layout Tab 1 (Quản lý giao dịch), bo góc các Panel
         // ================= TAB 1: QUẢN LÝ GIAO DỊCH =================
         JPanel panelQuanLy = new JPanel(new BorderLayout(15, 15));
         panelQuanLy.setBorder(new EmptyBorder(15, 15, 15, 15));
@@ -99,21 +105,19 @@ public class MainFrame extends JFrame {
         topFeaturePanel.add(statsPanel, BorderLayout.WEST);
         topFeaturePanel.add(searchPanel, BorderLayout.EAST);
 
-        // [FIX LAYOUT TAB 1]: Xếp thẳng hàng vuông vức
-        JPanel inputPanel = new JPanel(new GridLayout(2, 5, 10, 5)); // 2 Hàng, 5 Cột
+        // 👉 [PHẦN CỦA HIỀN]: Layout Form nhập liệu chuẩn GridLayout
+        JPanel inputPanel = new JPanel(new GridLayout(2, 5, 10, 5)); 
         inputPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), " Nhập Giao Dịch Mới ", 0, 0, new Font("Segoe UI", Font.BOLD, 15), COLOR_TEXT));
         inputPanel.setBackground(COLOR_PANEL_BG);
 
         Font labelFont = new Font("Segoe UI", Font.BOLD, 13);
         
-        // HÀNG 1: Xếp toàn bộ Label lên trên
         inputPanel.add(createLabel(" Loại:", labelFont)); 
         inputPanel.add(createLabel(" Số tiền (VND):", labelFont)); 
         inputPanel.add(createLabel(" Danh mục:", labelFont)); 
         inputPanel.add(createLabel(" Ghi chú:", labelFont)); 
-        inputPanel.add(new JLabel("")); // Label rỗng để chừa chỗ cho Nút ở dưới
+        inputPanel.add(new JLabel("")); 
 
-        // HÀNG 2: Xếp toàn bộ Ô nhập liệu xuống dưới
         cbType = new JComboBox<>(new String[]{"Khoản Chi", "Khoản Thu"}); inputPanel.add(cbType);
         txtAmount = new JTextField(); inputPanel.add(txtAmount);
         txtCategory = new JTextField(); inputPanel.add(txtCategory);
@@ -121,6 +125,7 @@ public class MainFrame extends JFrame {
 
         JButton btnAdd = new JButton("LƯU");
         btnAdd.setBackground(COLOR_ACCENT_GREEN); btnAdd.setForeground(Color.BLACK); btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        //  [PHẦN CỦA HIỀN]: Custom CSS Hover cho nút bấm
         btnAdd.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0; hoverBackground: #27ae60; pressedBackground: #1e8449;");
         inputPanel.add(btnAdd);
         
@@ -131,18 +136,22 @@ public class MainFrame extends JFrame {
 
         String[] columns = {"ID", "So Tien", "Danh Muc", "Ngay Giao Dich", "Ghi Chu"};
         tableModel = new DefaultTableModel(columns, 0); table = new JTable(tableModel);
+        
+        //  [PHẦN CỦA Ý]: Cấu hình RowSorter để làm tính năng Live Search
         rowSorter = new TableRowSorter<>(tableModel); table.setRowSorter(rowSorter);
 
+        //  [PHẦN CỦA Ý]: Xử lý sự kiện gõ phím để tìm kiếm tức thì (Live Search)
         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { search(txtSearch.getText()); }
             public void removeUpdate(DocumentEvent e) { search(txtSearch.getText()); }
             public void changedUpdate(DocumentEvent e) { search(txtSearch.getText()); }
             public void search(String str) {
                 if (str.trim().length() == 0) rowSorter.setRowFilter(null); 
-                else rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + str));
+                else rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + str)); // Regex tìm không phân biệt hoa thường
             }
         });
 
+        //  [PHẦN CỦA HIỀN]: Tùy chỉnh màu sắc bảng (JTable) và hiệu ứng Hover khi chọn dòng
         table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
@@ -163,6 +172,7 @@ public class MainFrame extends JFrame {
         btnDelete.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0; hoverBackground: #e86558;");
         actionPanel.add(btnDelete); panelQuanLy.add(actionPanel, BorderLayout.SOUTH);
 
+        // [PHẦN CỦA Ý & HIỀN]: Layout Tab 2 (Biểu đồ)
         // ================= TAB 2: THỐNG KÊ BIỂU ĐỒ =================
         JPanel panelThongKe = new JPanel(new BorderLayout());
         panelThongKe.setBackground(COLOR_BG);
@@ -170,12 +180,11 @@ public class MainFrame extends JFrame {
         chartContainer = new JPanel(new BorderLayout()); 
         chartContainer.setBackground(COLOR_BG); 
         
-        // [FIX LAYOUT TAB 2]: Gói nút Làm mới xuống dưới cùng, làm nhỏ lại
         JPanel bottomChartPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 15));
         bottomChartPanel.setBackground(COLOR_BG);
         
         JButton btnRefreshChart = new JButton("LÀM MỚI BIỂU ĐỒ");
-        btnRefreshChart.setBackground(new Color(60, 60, 60)); // Màu xám tối để không lấn át biểu đồ
+        btnRefreshChart.setBackground(new Color(60, 60, 60)); 
         btnRefreshChart.setForeground(Color.WHITE);
         btnRefreshChart.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnRefreshChart.setPreferredSize(new Dimension(180, 35));
@@ -185,8 +194,9 @@ public class MainFrame extends JFrame {
         bottomChartPanel.add(btnRefreshChart);
         
         panelThongKe.add(chartContainer, BorderLayout.CENTER);
-        panelThongKe.add(bottomChartPanel, BorderLayout.SOUTH); // Đẩy xuống phía Nam
+        panelThongKe.add(bottomChartPanel, BorderLayout.SOUTH); 
 
+        // [PHẦN CỦA HIỀN]: Thiết kế Layout Tab 3 Cố Vấn AI
         // ================= TAB 3: HOẠCH ĐỊNH & TIẾT KIỆM =================
         JPanel panelHoachDinh = new JPanel(new BorderLayout(20, 20));
         panelHoachDinh.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -236,6 +246,7 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Hoạch Định & Tiết Kiệm", panelHoachDinh);
         add(tabbedPane);
 
+        //  [PHẦN CỦA VINH]: Bắt sự kiện LƯU và XÓA (Gọi xuống Database)
         // ================= XỬ LÝ SỰ KIỆN =================
         btnAdd.addActionListener(e -> {
             try {
@@ -269,6 +280,7 @@ public class MainFrame extends JFrame {
         btnAnalyze.addActionListener(e -> analyzeFinance());
     }
 
+    //  [PHẦN CỦA HIỀN]: Các hàm tiện ích style cho Text Area và Panel
     // ================= CÁC HÀM TIỆN ÍCH =================
     private void styleTextArea(JTextArea area) {
         area.setEditable(false); area.setBackground(COLOR_PANEL_BG); area.setForeground(COLOR_TEXT);
@@ -285,7 +297,9 @@ public class MainFrame extends JFrame {
     private JLabel createLabel(String text, Font f) {
         JLabel lbl = new JLabel(text); lbl.setForeground(COLOR_TEXT); lbl.setFont(f); return lbl;
     }
-// ================= LOGIC PHÂN BIỆT THU CHI DỰA TRÊN DANH MỤC ================= // ẩn danh mục gốc, chỉ dựa vào từ khóa để phân loại chính xác hơn
+
+    //  [PHẦN CỦA VINH]: Logic AI Nhận diện từ khóa để tự động chia Thu/Chi
+    // ================= LOGIC PHÂN BIỆT THU CHI DỰA TRÊN DANH MỤC ================= 
     private boolean isIncomeCategory(String category) {
         String cat = category.toLowerCase();
         if (cat.contains("[thu]")) return true;
@@ -296,6 +310,7 @@ public class MainFrame extends JFrame {
         return false;
     }
 
+    //  [PHẦN CỦA VINH & HIỀN]: Vinh xử lý logic đếm tiền tổng, Hiền xử lý load lên bảng
     public void loadDataToTable() {
         tableModel.setRowCount(0); currentTotalExpense = 0; currentTotalIncome = 0; int count = 0;
         
@@ -315,6 +330,7 @@ public class MainFrame extends JFrame {
         else lblTotalAmount.setForeground(COLOR_ACCENT_GREEN);
     }
 
+    //  [PHẦN CỦA Ý]: Toàn bộ thuật toán vẽ biểu đồ Donut và Hoạt ảnh Animation xoay
     private void updateChart() {
         Map<String, Double> categoryData = new HashMap<>();
         for (Transaction t : controller.getAllTransactions()) {
@@ -348,6 +364,7 @@ public class MainFrame extends JFrame {
         ChartPanel chartPanel = new ChartPanel(chart); chartPanel.setBackground(COLOR_BG); 
         chartContainer.removeAll(); chartContainer.add(chartPanel, BorderLayout.CENTER); chartContainer.revalidate();
         
+        //  [PHẦN CỦA Ý]: Code xử lý Timer tạo hiệu ứng biểu đồ xoay 360 độ
         if (chartTimer != null && chartTimer.isRunning()) chartTimer.stop();
         final double[] currentAngle = {0.0}; plot.setLabelGenerator(null); 
         chartTimer = new Timer(15, e -> { 
@@ -361,6 +378,7 @@ public class MainFrame extends JFrame {
         chartTimer.start(); 
     }
 
+    // [PHẦN CỦA VINH]: Toàn bộ thuật toán AI phân bổ ngân sách 50/30/20 và Lãi kép
     // ================= LOGIC PHÂN TÍCH TÀI CHÍNH THÔNG MINH AUTO =================
     private void analyzeFinance() {
         try {
@@ -407,7 +425,7 @@ public class MainFrame extends JFrame {
             advice.append(String.format("[+] 20%% TIẾT KIỆM (Mục tiêu: %,.0f VND)\n", targetSavings));
             if (actualSaved >= targetSavings) advice.append(String.format(" >> Tiền dư hiện tại: %,.0f VND. Xuất sắc!\n", actualSaved));
             else if (actualSaved > 0) advice.append(String.format(" >> Tiền dư hiện tại: %,.0f VND. Hãy cố gắng tiết kiệm thêm!\n", actualSaved));
-            else advice.append(" ❌ Bạn đã tiêu âm vào cả tiền tiết kiệm của tương lai.\n");
+            else advice.append(" Bạn đã tiêu âm vào cả tiền tiết kiệm của tương lai.\n");
 
             txtBudgetAdvice.setText(advice.toString());
 

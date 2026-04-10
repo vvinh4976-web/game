@@ -14,7 +14,7 @@ public class RegisterFrame extends JFrame {
     public RegisterFrame() {
         userController = new UserController();
         setTitle("Đăng Ký - Hệ Thống Quản Lý Tài Chính");
-        setSize(400, 480); // Nới rộng xíu để chứa thêm Tên hiển thị
+        setSize(400, 480); 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
