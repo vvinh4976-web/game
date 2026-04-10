@@ -2,12 +2,11 @@ package view;
 
 import controller.TransactionController;
 import model.Transaction;
-import utils.InvalidInputException;
-
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
@@ -29,6 +28,7 @@ import org.jfree.data.general.DefaultPieDataset;
 
 public class MainFrame extends JFrame {
     private JTextField txtAmount, txtCategory, txtNote, txtSearch, txtIncome;
+    private JComboBox<String> cbType;
     private JTable table;
     private DefaultTableModel tableModel;
     private TableRowSorter<DefaultTableModel> rowSorter; 
@@ -38,7 +38,8 @@ public class MainFrame extends JFrame {
     private TransactionController controller;
     private JPanel chartContainer; 
     private Timer chartTimer;
-    private double currentTotalExpense = 0; // Lưu tổng chi tiêu hiện tại
+    private double currentTotalExpense = 0; 
+    private double currentTotalIncome = 0;
 
     private final Color COLOR_BG = new Color(18, 18, 18); 
     private final Color COLOR_PANEL_BG = new Color(30, 30, 30); 
@@ -57,7 +58,7 @@ public class MainFrame extends JFrame {
 
     private void initUI() {
         setTitle("Quan Ly Tai Chinh Pro - Nhom Vinh, Hien, Y");
-        setSize(1000, 720);
+        setSize(1050, 720);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(COLOR_BG);
@@ -81,7 +82,7 @@ public class MainFrame extends JFrame {
         lblTotalCount.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblTotalCount.setForeground(new Color(170, 170, 170));
         
-        lblTotalAmount = new JLabel("Tổng tiền: 0 VND");
+        lblTotalAmount = new JLabel("Tổng Thu: 0 | Tổng Chi: 0");
         lblTotalAmount.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTotalAmount.setForeground(COLOR_ACCENT_GREEN);
         
@@ -97,16 +98,21 @@ public class MainFrame extends JFrame {
         topFeaturePanel.add(statsPanel, BorderLayout.WEST);
         topFeaturePanel.add(searchPanel, BorderLayout.EAST);
 
-        JPanel inputPanel = new JPanel(new GridLayout(2, 4, 15, 15));
+        JPanel inputPanel = new JPanel(new GridLayout(2, 5, 10, 15)); 
         inputPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), " Nhap Giao Dich Moi ", 0, 0, new Font("Segoe UI", Font.BOLD, 15), COLOR_TEXT));
         inputPanel.setBackground(COLOR_PANEL_BG);
 
         Font labelFont = new Font("Segoe UI", Font.BOLD, 13);
-        inputPanel.add(createLabel(" So tien (VND):", labelFont)); txtAmount = new JTextField(); inputPanel.add(txtAmount);
-        inputPanel.add(createLabel(" Danh muc:", labelFont)); txtCategory = new JTextField(); inputPanel.add(txtCategory);
-        inputPanel.add(createLabel(" Ghi chu:", labelFont)); txtNote = new JTextField(); inputPanel.add(txtNote);
+        
+        inputPanel.add(createLabel(" Loại:", labelFont)); 
+        cbType = new JComboBox<>(new String[]{"Khoản Chi", "Khoản Thu"});
+        inputPanel.add(cbType);
+        
+        inputPanel.add(createLabel(" Số tiền (VND):", labelFont)); txtAmount = new JTextField(); inputPanel.add(txtAmount);
+        inputPanel.add(createLabel(" Danh mục:", labelFont)); txtCategory = new JTextField(); inputPanel.add(txtCategory);
+        inputPanel.add(createLabel(" Ghi chú:", labelFont)); txtNote = new JTextField(); inputPanel.add(txtNote);
 
-        JButton btnAdd = new JButton("LUU GIAO DICH");
+        JButton btnAdd = new JButton("LƯU");
         btnAdd.setBackground(COLOR_ACCENT_GREEN); btnAdd.setForeground(Color.BLACK); btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnAdd.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0; hoverBackground: #27ae60; pressedBackground: #1e8449;");
         inputPanel.add(btnAdd);
@@ -147,7 +153,7 @@ public class MainFrame extends JFrame {
         actionPanel.setBackground(COLOR_BG);
         JButton btnDelete = new JButton("XOA DONG CHON");
         btnDelete.setBackground(COLOR_ACCENT_RED); btnDelete.setForeground(Color.WHITE); btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnDelete.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0;");
+        btnDelete.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0; hoverBackground: #e86558;");
         actionPanel.add(btnDelete); panelQuanLy.add(actionPanel, BorderLayout.SOUTH);
 
         // ================= TAB 2: THỐNG KÊ BIỂU ĐỒ =================
@@ -157,44 +163,42 @@ public class MainFrame extends JFrame {
         btnRefreshChart.addActionListener(e -> updateChart()); 
         panelThongKe.add(btnRefreshChart, BorderLayout.NORTH); panelThongKe.add(chartContainer, BorderLayout.CENTER);
 
-        // ================= TAB 3: HOẠCH ĐỊNH & TIẾT KIỆM (TÍNH NĂNG MỚI) =================
+        // ================= TAB 3: HOẠCH ĐỊNH & TIẾT KIỆM (AUTO) =================
         JPanel panelHoachDinh = new JPanel(new BorderLayout(20, 20));
         panelHoachDinh.setBorder(new EmptyBorder(20, 20, 20, 20));
         panelHoachDinh.setBackground(COLOR_BG);
 
-        // Header: Nhập Thu Nhập
         JPanel incomePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         incomePanel.setBackground(COLOR_PANEL_BG);
         incomePanel.putClientProperty(FlatClientProperties.STYLE, "arc: 15;");
         
-        incomePanel.add(createLabel("Nhập Thu Nhập Tháng Này (VND): ", new Font("Segoe UI", Font.BOLD, 16)));
+        incomePanel.add(createLabel("Thu Nhập Hệ Thống Ghi Nhận (VND): ", new Font("Segoe UI", Font.BOLD, 16)));
         txtIncome = new JTextField(15);
         txtIncome.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        JButton btnAnalyze = new JButton("PHÂN TÍCH & CỐ VẤN");
+        txtIncome.setEditable(false); 
+        txtIncome.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Bấm Phân tích để lấy data");
+        
+        JButton btnAnalyze = new JButton("PHÂN TÍCH DATA & CỐ VẤN");
         btnAnalyze.setBackground(COLOR_ACCENT_BLUE);
         btnAnalyze.setForeground(Color.WHITE);
         btnAnalyze.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnAnalyze.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0;");
+        btnAnalyze.putClientProperty(FlatClientProperties.STYLE, "arc: 10; borderWidth: 0; hoverBackground: #2980b9;");
         incomePanel.add(txtIncome); incomePanel.add(btnAnalyze);
 
-        // Body: 2 Cột Báo Cáo
         JPanel reportPanel = new JPanel(new GridLayout(1, 2, 20, 0));
         reportPanel.setBackground(COLOR_BG);
 
-        // Cột 1: Đề xuất ngân sách 50/30/20
-        txtBudgetAdvice = new JTextArea("Vui lòng nhập thu nhập và bấm Phân Tích...");
+        txtBudgetAdvice = new JTextArea("Vui lòng ấn Phân Tích để hệ thống đồng bộ dữ liệu...");
         styleTextArea(txtBudgetAdvice);
-        JPanel pnlLeft = createTitledPanel("🎯 Đề Xuất Chi Tiêu (Quy tắc 50/30/20)", txtBudgetAdvice);
+        JPanel pnlLeft = createTitledPanel("🎯 Đối Chiếu Chi Tiêu Thực Tế", txtBudgetAdvice);
 
-        // Cột 2: Dự báo tương lai
         txtFutureForecast = new JTextArea("Dự báo tích lũy tài sản trong tương lai...");
         styleTextArea(txtFutureForecast);
         JPanel pnlRight = createTitledPanel("🚀 Dự Báo Tiết Kiệm & Lãi Kép", txtFutureForecast);
 
         reportPanel.add(pnlLeft); reportPanel.add(pnlRight);
 
-        // Footer: Cảnh báo an toàn
-        lblWarningStatus = new JLabel("TRẠNG THÁI: CHƯA XÁC ĐỊNH", SwingConstants.CENTER);
+        lblWarningStatus = new JLabel("TRẠNG THÁI: CHƯA ĐỒNG BỘ", SwingConstants.CENTER);
         lblWarningStatus.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblWarningStatus.setForeground(Color.GRAY);
         lblWarningStatus.setBorder(new EmptyBorder(10, 0, 10, 0));
@@ -203,31 +207,34 @@ public class MainFrame extends JFrame {
         panelHoachDinh.add(reportPanel, BorderLayout.CENTER);
         panelHoachDinh.add(lblWarningStatus, BorderLayout.SOUTH);
 
-        // ADD TABS
         tabbedPane.addTab("Quản Lý Thu Chi", panelQuanLy);
         tabbedPane.addTab("Biểu Đồ Thống Kê", panelThongKe);
-        tabbedPane.addTab("Hoạch Định & Tiết Kiệm", panelHoachDinh); // Thêm Tab 3
+        tabbedPane.addTab("Hoạch Định & Tiết Kiệm", panelHoachDinh);
         add(tabbedPane);
 
         // ================= XỬ LÝ SỰ KIỆN =================
         btnAdd.addActionListener(e -> {
             try {
-                if (txtAmount.getText().isEmpty() || txtCategory.getText().isEmpty()) throw new InvalidInputException("Khong duoc de trong!");
-                double amount = Double.parseDouble(txtAmount.getText());
-                Transaction t = new Transaction(0, amount, txtCategory.getText(), txtNote.getText(), "");
+                if (txtAmount.getText().isEmpty() || txtCategory.getText().isEmpty()) throw new Exception("Không được để trống!");
+                double amount = Double.parseDouble(txtAmount.getText().replace(",", "").trim());
+                
+                String typePrefix = cbType.getSelectedItem().equals("Khoản Thu") ? "[THU] " : "[CHI] ";
+                String finalCategory = typePrefix + txtCategory.getText().trim();
+
+                Transaction t = new Transaction(0, amount, finalCategory, txtNote.getText(), "");
                 if (controller.addTransaction(t)) {
-                    JOptionPane.showMessageDialog(null, "Luu thanh cong!");
+                    JOptionPane.showMessageDialog(null, "Lưu thành công!");
                     txtAmount.setText(""); txtCategory.setText(""); txtNote.setText("");
                     loadDataToTable(); updateChart(); 
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Loi nhap lieu: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Vui lòng nhập đúng số tiền hợp lệ!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             }
         });
 
         btnDelete.addActionListener(e -> {
             int row = table.getSelectedRow();
-            if (row != -1 && JOptionPane.showConfirmDialog(null, "Ban co chac xoa?", "Xac nhan", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (row != -1 && JOptionPane.showConfirmDialog(null, "Bạn có chắc xóa?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 int modelRow = table.convertRowIndexToModel(row);
                 if (controller.deleteTransaction((int) tableModel.getValueAt(modelRow, 0))) {
                     loadDataToTable(); updateChart();
@@ -235,72 +242,93 @@ public class MainFrame extends JFrame {
             }
         });
 
-        // SỰ KIỆN NÚT PHÂN TÍCH (Tính năng AI Cố vấn)
         btnAnalyze.addActionListener(e -> analyzeFinance());
     }
 
+    // ================= CÁC HÀM TIỆN ÍCH =================
     private void styleTextArea(JTextArea area) {
-        area.setEditable(false);
-        area.setBackground(COLOR_PANEL_BG);
-        area.setForeground(COLOR_TEXT);
-        area.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        area.setMargin(new Insets(15, 15, 15, 15));
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
+        area.setEditable(false); area.setBackground(COLOR_PANEL_BG); area.setForeground(COLOR_TEXT);
+        area.setFont(new Font("Segoe UI", Font.PLAIN, 14)); area.setMargin(new Insets(15, 15, 15, 15));
+        area.setLineWrap(true); area.setWrapStyleWord(true);
     }
 
     private JPanel createTitledPanel(String title, JTextArea content) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(COLOR_PANEL_BG);
+        JPanel p = new JPanel(new BorderLayout()); p.setBackground(COLOR_PANEL_BG);
         p.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(COLOR_ACCENT_BLUE), title, 0, 0, new Font("Segoe UI", Font.BOLD, 15), COLOR_ACCENT_BLUE));
-        p.add(new JScrollPane(content), BorderLayout.CENTER);
-        return p;
+        p.add(new JScrollPane(content), BorderLayout.CENTER); return p;
     }
 
     private JLabel createLabel(String text, Font f) {
         JLabel lbl = new JLabel(text); lbl.setForeground(COLOR_TEXT); lbl.setFont(f); return lbl;
     }
 
+    // HÀM AI: Nhận diện từ khóa Thu Nhập thông minh (Dành cho dữ liệu cũ)
+    private boolean isIncomeCategory(String category) {
+        String cat = category.toLowerCase();
+        if (cat.contains("[thu]")) return true;
+        // Quét dữ liệu cũ trong Database
+        if (cat.contains("luong") || cat.contains("lương")) return true;
+        if (cat.contains("thuong") || cat.contains("thưởng")) return true;
+        if (cat.contains("phu cap") || cat.contains("phụ cấp")) return true;
+        if (cat.contains("chu cap") || cat.contains("chu cấp")) return true;
+        if (cat.contains("lixi") || cat.contains("lì xì") || cat.contains("mung tuoi")) return true;
+        return false;
+    }
+
     public void loadDataToTable() {
-        tableModel.setRowCount(0);
-        currentTotalExpense = 0;
-        int count = 0;
+        tableModel.setRowCount(0); currentTotalExpense = 0; currentTotalIncome = 0; int count = 0;
+        
         for (Transaction t : controller.getAllTransactions()) {
             tableModel.addRow(new Object[]{ t.getId(), String.format("%,.0f VND", t.getAmount()), t.getCategory(), t.getDate(), t.getNote() });
-            currentTotalExpense += t.getAmount();
             count++;
+            // Dùng AI để phân loại Thu - Chi
+            if (isIncomeCategory(t.getCategory())) {
+                currentTotalIncome += t.getAmount();
+            } else {
+                currentTotalExpense += t.getAmount();
+            }
         }
         lblTotalCount.setText("Giao dịch: " + count);
-        lblTotalAmount.setText("Tổng tiền: " + String.format("%,.0f VND", currentTotalExpense));
+        lblTotalAmount.setText(String.format("Tổng Thu: %,.0f VND | Tổng Chi: %,.0f VND", currentTotalIncome, currentTotalExpense));
+        
+        if(currentTotalExpense > currentTotalIncome && currentTotalIncome > 0) lblTotalAmount.setForeground(COLOR_ACCENT_RED);
+        else lblTotalAmount.setForeground(COLOR_ACCENT_GREEN);
     }
 
     private void updateChart() {
         Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
-        if (categoryData.isEmpty()) {
-            chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return;
-        }
+        if (categoryData.isEmpty()) { chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return; }
+        
         DefaultPieDataset dataset = new DefaultPieDataset();
-        for (Map.Entry<String, Double> entry : categoryData.entrySet()) dataset.setValue(entry.getKey(), entry.getValue());
+        boolean hasExpense = false;
+        
+        for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
+            // LỌC: Ẩn các khoản Thu (Lương, Thưởng) khỏi biểu đồ
+            if (!isIncomeCategory(entry.getKey())) {
+                String cleanName = entry.getKey().replace("[CHI] ", "").replace("[CHI]", "").trim();
+                dataset.setValue(cleanName, entry.getValue());
+                hasExpense = true;
+            }
+        }
 
-        JFreeChart chart = ChartFactory.createRingChart("PHAN TICH CHI TIEU", dataset, false, true, false); 
+        // Nếu chỉ toàn là Thu nhập, không có Chi tiêu thì xóa biểu đồ trắng
+        if (!hasExpense) { chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return; }
+
+        JFreeChart chart = ChartFactory.createRingChart("PHÂN TÍCH CHI TIÊU", dataset, false, true, false); 
         chart.getTitle().setPaint(COLOR_TEXT); chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 18));
-
         RingPlot plot = (RingPlot) chart.getPlot();
         plot.setSectionDepth(0.30); chart.setBackgroundPaint(COLOR_BG); plot.setBackgroundPaint(COLOR_BG);
         plot.setOutlineVisible(false); plot.setShadowPaint(null);     
         plot.setSeparatorPaint(COLOR_BG); plot.setSeparatorStroke(new BasicStroke(5.0f)); 
         
-        plot.setSectionPaint("an uong", Color.decode("#FFB142")); 
-        plot.setSectionPaint("mua sam", Color.decode("#33D9B2")); 
-        plot.setSectionPaint("giai tri", Color.decode("#FF5252")); 
-        plot.setSectionPaint("hoa don", Color.decode("#34ACE0")); 
+        plot.setSectionPaint("an uong", Color.decode("#FFB142")); plot.setSectionPaint("mua sam", Color.decode("#33D9B2")); 
+        plot.setSectionPaint("giai tri", Color.decode("#FF5252")); plot.setSectionPaint("hoa don", Color.decode("#34ACE0")); 
         plot.setSectionPaint("di lai", Color.decode("#D980FA"));  
         
-        plot.setLabelFont(new Font("Segoe UI", Font.BOLD, 13));
-        plot.setLabelPaint(COLOR_TEXT); plot.setLabelBackgroundPaint(COLOR_BG); plot.setLabelOutlinePaint(null); plot.setLabelShadowPaint(null);  
+        plot.setLabelFont(new Font("Segoe UI", Font.BOLD, 13)); plot.setLabelPaint(COLOR_TEXT); 
+        plot.setLabelBackgroundPaint(COLOR_BG); plot.setLabelOutlinePaint(null); plot.setLabelShadowPaint(null);  
 
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setBackground(COLOR_BG); 
+        ChartPanel chartPanel = new ChartPanel(chart); chartPanel.setBackground(COLOR_BG); 
         chartContainer.removeAll(); chartContainer.add(chartPanel, BorderLayout.CENTER); chartContainer.revalidate();
         
         if (chartTimer != null && chartTimer.isRunning()) chartTimer.stop();
@@ -315,57 +343,84 @@ public class MainFrame extends JFrame {
         });
         chartTimer.start(); 
     }
-    // ================= LOGIC PHÂN TÍCH TÀI CHÍNH THÔNG MINH =================
-   // ================= LOGIC PHÂN TÍCH TÀI CHÍNH THÔNG MINH =================
+
+    // ================= LOGIC PHÂN TÍCH TÀI CHÍNH THÔNG MINH AUTO =================
     private void analyzeFinance() {
         try {
-            double income = Double.parseDouble(txtIncome.getText());
-            if (income <= 0) throw new Exception();
+            double income = 0; double actualNeeds = 0; double actualWants = 0;
+            Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
+            
+            for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
+                String cat = entry.getKey().toLowerCase();
+                double amount = entry.getValue();
 
-            // 1. Quy tắc 50/30/20
-            double needs = income * 0.50;  // Thiết yếu
-            double wants = income * 0.30;  // Cá nhân
-            double savings = income * 0.20; // Tiết kiệm
+                if (isIncomeCategory(cat)) {
+                    income += amount; // Đưa Lương, Thưởng vào Thu Nhập
+                } else {
+                    if (cat.contains("an uong") || cat.contains("ăn uống") || cat.contains("hoa don") || cat.contains("hóa đơn") || cat.contains("di lai") || cat.contains("đi lại") || cat.contains("thue") || cat.contains("thuê") || cat.contains("tien nha") || cat.contains("tiền nhà")) {
+                        actualNeeds += amount;
+                    } else {
+                        actualWants += amount; 
+                    }
+                }
+            }
 
-            String advice = String.format(
-                "Để tài chính khỏe mạnh, hệ thống đề xuất chia %,.0f VND như sau:\n\n" +
-                "[!] 50%% Nhu cầu thiết yếu (Ăn uống, Hóa đơn, Thuê nhà):\n >> %,.0f VND\n\n" +
-                "[*] 30%% Chi tiêu cá nhân (Mua sắm, Giải trí, Bạn bè):\n >> %,.0f VND\n\n" +
-                "[+] 20%% Tiết kiệm & Đầu tư (Quỹ dự phòng, Gửi tiết kiệm):\n >> %,.0f VND\n\n" +
-                "=> Mẹo: Hãy trích 20%% tiết kiệm ngay khi nhận lương trước khi chi tiêu!", 
-                income, needs, wants, savings
-            );
-            txtBudgetAdvice.setText(advice);
+            txtIncome.setText(String.format("%,.0f", income));
 
-            // 2. Dự báo tương lai (Giả sử lãi suất 6%/năm)
-            double savings1Year = (savings * 12) * 1.06;
-            double savings3Years = (savings * 12 * 3) * 1.15; // Lãi kép ước tính
-            double savings5Years = (savings * 12 * 5) * 1.25;
+            if (income <= 0) {
+                JOptionPane.showMessageDialog(this, "Hệ thống chưa tìm thấy dữ liệu Thu Nhập!\nVui lòng sang Tab 'Quản Lý Thu Chi' thêm các 'Khoản Thu' trước.", "Chưa có dữ liệu", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            double targetNeeds = income * 0.50; double targetWants = income * 0.30; double targetSavings = income * 0.20;
+
+            StringBuilder advice = new StringBuilder();
+            advice.append(String.format("Đã quét Database. Đối chiếu Thu nhập %,.0f VND với Chi tiêu:\n\n", income));
+
+            advice.append(String.format("[!] 50%% THIẾT YẾU (Ngân sách chuẩn: %,.0f VND)\n", targetNeeds));
+            advice.append(String.format(" >> Thực tế đã chi: %,.0f VND (Chiếm %.1f%%)\n", actualNeeds, (actualNeeds/income)*100));
+            if (actualNeeds > targetNeeds) advice.append(" ⚠️ BÁO ĐỘNG: Tiền sinh hoạt đang lố. Cần siết chặt lại!\n\n");
+            else advice.append(" [v] TỐT: Chi tiêu sinh hoạt trong mức an toàn.\n\n");
+
+            advice.append(String.format("[*] 30%% CÁ NHÂN (Ngân sách chuẩn: %,.0f VND)\n", targetWants));
+            advice.append(String.format(" >> Thực tế đã chi: %,.0f VND (Chiếm %.1f%%)\n", actualWants, (actualWants/income)*100));
+            if (actualWants > targetWants) advice.append(" ⚠️ BÁO ĐỘNG: Đang mua sắm, giải trí quá tay!\n\n");
+            else advice.append(" [v] TỐT: Kiểm soát nhu cầu cá nhân rất tốt.\n\n");
+
+            double actualSaved = income - (actualNeeds + actualWants);
+            advice.append(String.format("[+] 20%% TIẾT KIỆM (Mục tiêu: %,.0f VND)\n", targetSavings));
+            if (actualSaved >= targetSavings) advice.append(String.format(" >> Tiền dư hiện tại: %,.0f VND. Xuất sắc!\n", actualSaved));
+            else if (actualSaved > 0) advice.append(String.format(" >> Tiền dư hiện tại: %,.0f VND. Hãy cố gắng tiết kiệm thêm!\n", actualSaved));
+            else advice.append(" ❌ Bạn đã tiêu âm vào cả tiền tiết kiệm của tương lai.\n");
+
+            txtBudgetAdvice.setText(advice.toString());
+
+            double monthlySavings = (actualSaved > 0) ? actualSaved : targetSavings; 
+            double savings1Year = (monthlySavings * 12) * 1.06;
+            double savings3Years = (monthlySavings * 12 * 3) * 1.15;
+            double savings5Years = (monthlySavings * 12 * 5) * 1.25;
 
             String forecast = String.format(
-                "Nếu bạn duy trì kỷ luật tiết kiệm 20%% (%,.0f VND/tháng) và đem gửi tiết kiệm (lãi suất ước tính 6%%/năm):\n\n" +
-                "- Sau 1 năm, bạn sẽ có:\n >> %,.0f VND\n\n" +
+                "Dựa trên số dư hiện tại (%,.0f VND/tháng) và đem tích lũy (lãi 6%%/năm):\n\n" +
+                "- Sau 1 năm, tài sản của bạn là:\n >> %,.0f VND\n\n" +
                 "- Sau 3 năm, bạn sẽ có:\n >> %,.0f VND\n\n" +
-                "- Sau 5 năm, bạn sẽ có một gia tài nhỏ:\n >> %,.0f VND\n\n" +
-                "=> Lãi kép chính là kỳ quan thứ 8 của thế giới. Hãy bắt đầu ngay hôm nay!", 
-                savings, savings1Year, savings3Years, savings5Years
+                "- Sau 5 năm, lãi kép biến nó thành:\n >> %,.0f VND\n\n" +
+                "=> Hãy duy trì thu chi hợp lý để sớm tự do tài chính!", 
+                monthlySavings, savings1Year, savings3Years, savings5Years
             );
             txtFutureForecast.setText(forecast);
 
-            // 3. Cảnh báo thông minh
             if (currentTotalExpense >= income) {
-                lblWarningStatus.setText("[!] BÁO ĐỘNG ĐỎ: BẠN ĐANG CHI TIÊU ÂM TIỀN (Vượt quá thu nhập)!");
+                lblWarningStatus.setText("[!] BÁO ĐỘNG ĐỎ: ĐÃ TIÊU ÂM TIỀN LƯƠNG!");
                 lblWarningStatus.setForeground(COLOR_ACCENT_RED);
             } else if (currentTotalExpense >= income * 0.8) {
-                lblWarningStatus.setText("(!) CẢNH BÁO VÀNG: Đã tiêu hơn 80% thu nhập. Hãy cẩn thận!");
+                lblWarningStatus.setText("(!) CẢNH BÁO VÀNG: Tổng chi đã lố 80% thu nhập! Siết chặt ví lại!");
                 lblWarningStatus.setForeground(Color.YELLOW);
             } else {
-                lblWarningStatus.setText("[v] AN TOÀN: Tình hình thu chi của bạn đang nằm trong tầm kiểm soát.");
+                lblWarningStatus.setText("[v] AN TOÀN: Kỷ luật tài chính của bạn đang rất tuyệt vời!");
                 lblWarningStatus.setForeground(COLOR_ACCENT_GREEN);
             }
 
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng số tiền thu nhập (chỉ nhập số)!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
+        } catch (Exception ex) {}
     }
 }

@@ -3,11 +3,11 @@
 > **🔗 [Link Video Demo YouTube]:** (Dán link video của nhóm vào đây)
 
 ## 👥 Thông tin nhóm (Team Members)
-| STT | Họ và Tên | Vai trò / Nhiệm vụ | Link GitHub Cá Nhân |
+| STT | Tên | Vai trò / Nhiệm vụ | Link GitHub Cá Nhân |
 |---|---|---|---|
-| 1 | [Tên của Vinh] | Code Controller, Database, Xử lý Logic | [GitHub](link_cua_Vinh) |
-| 2 | [Tên của Hiền] | Code UI/UX, Tích hợp FlatLaf Dark Theme | [GitHub](link_cua_Hien) |
-| 3 | [Tên của Ý] | Biểu đồ JFreeChart, Animation, Báo cáo | [GitHub](link_cua_Y) |
+| 1 | [Vinh] | Code Controller, Database, Xử lý Logic | [GitHub](link_cua_Vinh) |
+| 2 | [THiền] | Code UI/UX, Tích hợp FlatLaf Dark Theme | [GitHub](link_cua_Hien) |
+| 3 |  [Ý] | Biểu đồ JFreeChart, Animation, Báo cáo | [GitHub](link_cua_Y) |
 
 ## 📝 Giới thiệu dự án (Description)
 Đây là phần mềm Quản lý Tài chính cá nhân thông minh giúp sinh viên và người đi làm dễ dàng ghi chép thu chi, quản lý ngân sách. Ứng dụng nổi bật với giao diện Dark Theme hiện đại, khả năng phân tích dữ liệu trực quan bằng biểu đồ động và tích hợp "Cố vấn tài chính AI" tự động cảnh báo chi tiêu.
@@ -46,7 +46,7 @@ Mã nguồn được tổ chức chặt chẽ theo mô hình **MVC (Model - View
 * Mở project bằng IDE. Add toàn bộ file `.jar` trong thư mục `lib` vào Referenced Libraries.
 3. **Chạy ứng dụng:**
 * Chạy file `Main.java` (Nằm ở thư mục gốc) để bắt đầu.
-* *Tài khoản test:* `admin` / pass: `123456` hoặc `vinh` / pass: `12345`
+
 
 ## 📸 Ảnh chụp màn hình (Screenshots)
 ![alt text](image.png) ![alt text](image-1.png) ![alt text](image-2.png) ![alt text](image-3.png)

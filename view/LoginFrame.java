@@ -81,10 +81,8 @@ public class LoginFrame extends JFrame {
             // Lấy dữ liệu người dùng nhập
             String user = txtUsername.getText().trim();
             String pass = new String(txtPassword.getPassword());
-
             boolean isSuccess = false;
             String displayName = "";
-
             // --- KIỂM TRA TÀI KHOẢN NHIỀU NGƯỜI (Bỏ qua viết hoa/thường) ---
             if (user.equalsIgnoreCase("Vinh") && pass.equals("12345")) {
                 isSuccess = true; displayName = "Vinh";
