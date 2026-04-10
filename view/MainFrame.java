@@ -7,10 +7,11 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;// của ý
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -53,7 +54,7 @@ public class MainFrame extends JFrame {
         try { UIManager.setLookAndFeel(new FlatDarkLaf()); } catch (Exception ex) {}
         initUI();
         loadDataToTable();
-        updateChart(); // hàm của Ý
+        updateChart(); 
     }
 
     private void initUI() {
@@ -90,7 +91,7 @@ public class MainFrame extends JFrame {
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         searchPanel.setBackground(COLOR_BG);
-        searchPanel.add(createLabel("🔍 Tìm kiếm:", new Font("Segoe UI", Font.BOLD, 13)));
+        searchPanel.add(createLabel("Tìm kiếm:", new Font("Segoe UI", Font.BOLD, 13)));
         txtSearch = new JTextField(15);
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập danh mục, ghi chú...");
         searchPanel.add(txtSearch);
@@ -98,19 +99,25 @@ public class MainFrame extends JFrame {
         topFeaturePanel.add(statsPanel, BorderLayout.WEST);
         topFeaturePanel.add(searchPanel, BorderLayout.EAST);
 
-        JPanel inputPanel = new JPanel(new GridLayout(2, 5, 10, 15)); 
-        inputPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), " Nhap Giao Dich Moi ", 0, 0, new Font("Segoe UI", Font.BOLD, 15), COLOR_TEXT));
+        // [FIX LAYOUT TAB 1]: Xếp thẳng hàng vuông vức
+        JPanel inputPanel = new JPanel(new GridLayout(2, 5, 10, 5)); // 2 Hàng, 5 Cột
+        inputPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), " Nhập Giao Dịch Mới ", 0, 0, new Font("Segoe UI", Font.BOLD, 15), COLOR_TEXT));
         inputPanel.setBackground(COLOR_PANEL_BG);
 
         Font labelFont = new Font("Segoe UI", Font.BOLD, 13);
         
+        // HÀNG 1: Xếp toàn bộ Label lên trên
         inputPanel.add(createLabel(" Loại:", labelFont)); 
-        cbType = new JComboBox<>(new String[]{"Khoản Chi", "Khoản Thu"});
-        inputPanel.add(cbType);
-        
-        inputPanel.add(createLabel(" Số tiền (VND):", labelFont)); txtAmount = new JTextField(); inputPanel.add(txtAmount);
-        inputPanel.add(createLabel(" Danh mục:", labelFont)); txtCategory = new JTextField(); inputPanel.add(txtCategory);
-        inputPanel.add(createLabel(" Ghi chú:", labelFont)); txtNote = new JTextField(); inputPanel.add(txtNote);
+        inputPanel.add(createLabel(" Số tiền (VND):", labelFont)); 
+        inputPanel.add(createLabel(" Danh mục:", labelFont)); 
+        inputPanel.add(createLabel(" Ghi chú:", labelFont)); 
+        inputPanel.add(new JLabel("")); // Label rỗng để chừa chỗ cho Nút ở dưới
+
+        // HÀNG 2: Xếp toàn bộ Ô nhập liệu xuống dưới
+        cbType = new JComboBox<>(new String[]{"Khoản Chi", "Khoản Thu"}); inputPanel.add(cbType);
+        txtAmount = new JTextField(); inputPanel.add(txtAmount);
+        txtCategory = new JTextField(); inputPanel.add(txtCategory);
+        txtNote = new JTextField(); inputPanel.add(txtNote);
 
         JButton btnAdd = new JButton("LƯU");
         btnAdd.setBackground(COLOR_ACCENT_GREEN); btnAdd.setForeground(Color.BLACK); btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -125,7 +132,7 @@ public class MainFrame extends JFrame {
         String[] columns = {"ID", "So Tien", "Danh Muc", "Ngay Giao Dich", "Ghi Chu"};
         tableModel = new DefaultTableModel(columns, 0); table = new JTable(tableModel);
         rowSorter = new TableRowSorter<>(tableModel); table.setRowSorter(rowSorter);
-// hàm tìm kiếm của Ý
+
         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { search(txtSearch.getText()); }
             public void removeUpdate(DocumentEvent e) { search(txtSearch.getText()); }
@@ -135,7 +142,7 @@ public class MainFrame extends JFrame {
                 else rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + str));
             }
         });
-// Hiền design
+
         table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
@@ -158,12 +165,29 @@ public class MainFrame extends JFrame {
 
         // ================= TAB 2: THỐNG KÊ BIỂU ĐỒ =================
         JPanel panelThongKe = new JPanel(new BorderLayout());
-        chartContainer = new JPanel(new BorderLayout()); chartContainer.setBackground(COLOR_BG); 
-        JButton btnRefreshChart = new JButton("Lam moi bieu do");
+        panelThongKe.setBackground(COLOR_BG);
+        
+        chartContainer = new JPanel(new BorderLayout()); 
+        chartContainer.setBackground(COLOR_BG); 
+        
+        // [FIX LAYOUT TAB 2]: Gói nút Làm mới xuống dưới cùng, làm nhỏ lại
+        JPanel bottomChartPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 15));
+        bottomChartPanel.setBackground(COLOR_BG);
+        
+        JButton btnRefreshChart = new JButton("LÀM MỚI BIỂU ĐỒ");
+        btnRefreshChart.setBackground(new Color(60, 60, 60)); // Màu xám tối để không lấn át biểu đồ
+        btnRefreshChart.setForeground(Color.WHITE);
+        btnRefreshChart.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnRefreshChart.setPreferredSize(new Dimension(180, 35));
+        btnRefreshChart.putClientProperty(FlatClientProperties.STYLE, "arc: 15; borderWidth: 0; hoverBackground: #4d4d4d;");
         btnRefreshChart.addActionListener(e -> updateChart()); 
-        panelThongKe.add(btnRefreshChart, BorderLayout.NORTH); panelThongKe.add(chartContainer, BorderLayout.CENTER);
+        
+        bottomChartPanel.add(btnRefreshChart);
+        
+        panelThongKe.add(chartContainer, BorderLayout.CENTER);
+        panelThongKe.add(bottomChartPanel, BorderLayout.SOUTH); // Đẩy xuống phía Nam
 
-        // ================= TAB 3: HOẠCH ĐỊNH & TIẾT KIỆM (AUTO) =================
+        // ================= TAB 3: HOẠCH ĐỊNH & TIẾT KIỆM =================
         JPanel panelHoachDinh = new JPanel(new BorderLayout(20, 20));
         panelHoachDinh.setBorder(new EmptyBorder(20, 20, 20, 20));
         panelHoachDinh.setBackground(COLOR_BG);
@@ -190,11 +214,11 @@ public class MainFrame extends JFrame {
 
         txtBudgetAdvice = new JTextArea("Vui lòng ấn Phân Tích để hệ thống đồng bộ dữ liệu...");
         styleTextArea(txtBudgetAdvice);
-        JPanel pnlLeft = createTitledPanel("🎯 Đối Chiếu Chi Tiêu Thực Tế", txtBudgetAdvice);
+        JPanel pnlLeft = createTitledPanel("Đối Chiếu Chi Tiêu Thực Tế", txtBudgetAdvice);
 
         txtFutureForecast = new JTextArea("Dự báo tích lũy tài sản trong tương lai...");
         styleTextArea(txtFutureForecast);
-        JPanel pnlRight = createTitledPanel("🚀 Dự Báo Tiết Kiệm & Lãi Kép", txtFutureForecast);
+        JPanel pnlRight = createTitledPanel("Dự Báo Tiết Kiệm & Lãi Kép", txtFutureForecast);
 
         reportPanel.add(pnlLeft); reportPanel.add(pnlRight);
 
@@ -261,8 +285,7 @@ public class MainFrame extends JFrame {
     private JLabel createLabel(String text, Font f) {
         JLabel lbl = new JLabel(text); lbl.setForeground(COLOR_TEXT); lbl.setFont(f); return lbl;
     }
-
-    // HÀM AI: Nhận diện từ khóa Thu Nhập thông minh
+// ================= LOGIC PHÂN BIỆT THU CHI DỰA TRÊN DANH MỤC ================= // ẩn danh mục gốc, chỉ dựa vào từ khóa để phân loại chính xác hơn
     private boolean isIncomeCategory(String category) {
         String cat = category.toLowerCase();
         if (cat.contains("[thu]")) return true;
@@ -293,7 +316,6 @@ public class MainFrame extends JFrame {
     }
 
     private void updateChart() {
-        // FIX: Tự động gom nhóm dựa trên danh sách getAllTransactions để không bị lỗi từ DB
         Map<String, Double> categoryData = new HashMap<>();
         for (Transaction t : controller.getAllTransactions()) {
             if (!isIncomeCategory(t.getCategory())) {
@@ -325,7 +347,7 @@ public class MainFrame extends JFrame {
 
         ChartPanel chartPanel = new ChartPanel(chart); chartPanel.setBackground(COLOR_BG); 
         chartContainer.removeAll(); chartContainer.add(chartPanel, BorderLayout.CENTER); chartContainer.revalidate();
-        // // Ý giải thích: "Em dùng Timer của Swing, cứ 15 mili-giây thì cho biểu đồ quay thêm 5 độ cho đến khi đủ 360 độ"
+        
         if (chartTimer != null && chartTimer.isRunning()) chartTimer.stop();
         final double[] currentAngle = {0.0}; plot.setLabelGenerator(null); 
         chartTimer = new Timer(15, e -> { 
@@ -344,7 +366,6 @@ public class MainFrame extends JFrame {
         try {
             double income = 0; double actualNeeds = 0; double actualWants = 0;
             
-            // FIX: Dùng getAllTransactions để chắc chắn không bao giờ bị sót Lương
             for (Transaction t : controller.getAllTransactions()) {
                 String cat = t.getCategory().toLowerCase();
                 double amount = t.getAmount();
