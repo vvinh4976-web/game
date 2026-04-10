@@ -7,7 +7,7 @@
 |---|---|---|---|---|
 | 1 | Trương Võ Quang Vinh | 25CNTT1 msv 3120225176 | Code Controller, Database, Xử lý Logic | [GitHub](https://github.com/vvinh4976-web) |
 | 2 | Phạm Lê Thanh Hiền | 25CNTT2 msv 3120225048 | Code UI/UX, Tích hợp FlatLaf Dark Theme | [GitHub](https://github.com/phamlethanhhien207-commits) |
-| 3 | Phan Thị Ý | 25CNTT2 msv 3120225183 | Biểu đồ JFreeChart, Animation, Báo cáo | [GitHub](https://github.com/nhuyphan) |
+| 3 | Phan Thị Như Ý | 25CNTT2 msv 3120225183 | Biểu đồ JFreeChart, Animation, Báo cáo | [GitHub](https://github.com/nhuyphan) |
 
 ## 📝 Giới thiệu dự án (Description)
 Đây là phần mềm Quản lý Tài chính cá nhân thông minh giúp sinh viên và người đi làm dễ dàng ghi chép thu chi, quản lý ngân sách. Ứng dụng nổi bật với giao diện Dark Theme hiện đại, khả năng phân tích dữ liệu trực quan bằng biểu đồ động và tích hợp "Cố vấn tài chính AI" tự động cảnh báo chi tiêu.
