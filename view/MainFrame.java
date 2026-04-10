@@ -2,6 +2,8 @@ package view;
 
 import controller.TransactionController;
 import model.Transaction;
+import utils.InvalidInputException;
+
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Map;
@@ -210,7 +212,7 @@ public class MainFrame extends JFrame {
         // ================= XỬ LÝ SỰ KIỆN =================
         btnAdd.addActionListener(e -> {
             try {
-                if (txtAmount.getText().isEmpty() || txtCategory.getText().isEmpty()) throw new Exception("Khong duoc de trong!");
+                if (txtAmount.getText().isEmpty() || txtCategory.getText().isEmpty()) throw new InvalidInputException("Khong duoc de trong!");
                 double amount = Double.parseDouble(txtAmount.getText());
                 Transaction t = new Transaction(0, amount, txtCategory.getText(), txtNote.getText(), "");
                 if (controller.addTransaction(t)) {
@@ -313,7 +315,6 @@ public class MainFrame extends JFrame {
         });
         chartTimer.start(); 
     }
-
     // ================= LOGIC PHÂN TÍCH TÀI CHÍNH THÔNG MINH =================
    // ================= LOGIC PHÂN TÍCH TÀI CHÍNH THÔNG MINH =================
     private void analyzeFinance() {
