@@ -4,6 +4,7 @@ import controller.TransactionController;
 import model.Transaction;
 import java.awt.*;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -262,15 +263,13 @@ public class MainFrame extends JFrame {
         JLabel lbl = new JLabel(text); lbl.setForeground(COLOR_TEXT); lbl.setFont(f); return lbl;
     }
 
-    // HÀM AI: Nhận diện từ khóa Thu Nhập thông minh (Dành cho dữ liệu cũ)
+    // HÀM AI: Nhận diện từ khóa Thu Nhập thông minh
     private boolean isIncomeCategory(String category) {
         String cat = category.toLowerCase();
         if (cat.contains("[thu]")) return true;
-        // Quét dữ liệu cũ trong Database
         if (cat.contains("luong") || cat.contains("lương")) return true;
         if (cat.contains("thuong") || cat.contains("thưởng")) return true;
         if (cat.contains("phu cap") || cat.contains("phụ cấp")) return true;
-        if (cat.contains("chu cap") || cat.contains("chu cấp")) return true;
         if (cat.contains("lixi") || cat.contains("lì xì") || cat.contains("mung tuoi")) return true;
         return false;
     }
@@ -281,7 +280,6 @@ public class MainFrame extends JFrame {
         for (Transaction t : controller.getAllTransactions()) {
             tableModel.addRow(new Object[]{ t.getId(), String.format("%,.0f VND", t.getAmount()), t.getCategory(), t.getDate(), t.getNote() });
             count++;
-            // Dùng AI để phân loại Thu - Chi
             if (isIncomeCategory(t.getCategory())) {
                 currentTotalIncome += t.getAmount();
             } else {
@@ -296,23 +294,21 @@ public class MainFrame extends JFrame {
     }
 
     private void updateChart() {
-        Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
-        if (categoryData.isEmpty()) { chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return; }
-        
-        DefaultPieDataset dataset = new DefaultPieDataset();
-        boolean hasExpense = false;
-        
-        for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
-            // LỌC: Ẩn các khoản Thu (Lương, Thưởng) khỏi biểu đồ
-            if (!isIncomeCategory(entry.getKey())) {
-                String cleanName = entry.getKey().replace("[CHI] ", "").replace("[CHI]", "").trim();
-                dataset.setValue(cleanName, entry.getValue());
-                hasExpense = true;
+        // FIX: Tự động gom nhóm dựa trên danh sách getAllTransactions để không bị lỗi từ DB
+        Map<String, Double> categoryData = new HashMap<>();
+        for (Transaction t : controller.getAllTransactions()) {
+            if (!isIncomeCategory(t.getCategory())) {
+                String cleanName = t.getCategory().replace("[CHI] ", "").replace("[CHI]", "").trim();
+                categoryData.put(cleanName, categoryData.getOrDefault(cleanName, 0.0) + t.getAmount());
             }
         }
 
-        // Nếu chỉ toàn là Thu nhập, không có Chi tiêu thì xóa biểu đồ trắng
-        if (!hasExpense) { chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return; }
+        if (categoryData.isEmpty()) { chartContainer.removeAll(); chartContainer.revalidate(); chartContainer.repaint(); return; }
+        
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
+            dataset.setValue(entry.getKey(), entry.getValue());
+        }
 
         JFreeChart chart = ChartFactory.createRingChart("PHÂN TÍCH CHI TIÊU", dataset, false, true, false); 
         chart.getTitle().setPaint(COLOR_TEXT); chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 18));
@@ -348,14 +344,14 @@ public class MainFrame extends JFrame {
     private void analyzeFinance() {
         try {
             double income = 0; double actualNeeds = 0; double actualWants = 0;
-            Map<String, Double> categoryData = controller.getExpenseSummaryByCategory();
             
-            for (Map.Entry<String, Double> entry : categoryData.entrySet()) {
-                String cat = entry.getKey().toLowerCase();
-                double amount = entry.getValue();
+            // FIX: Dùng getAllTransactions để chắc chắn không bao giờ bị sót Lương
+            for (Transaction t : controller.getAllTransactions()) {
+                String cat = t.getCategory().toLowerCase();
+                double amount = t.getAmount();
 
                 if (isIncomeCategory(cat)) {
-                    income += amount; // Đưa Lương, Thưởng vào Thu Nhập
+                    income += amount; 
                 } else {
                     if (cat.contains("an uong") || cat.contains("ăn uống") || cat.contains("hoa don") || cat.contains("hóa đơn") || cat.contains("di lai") || cat.contains("đi lại") || cat.contains("thue") || cat.contains("thuê") || cat.contains("tien nha") || cat.contains("tiền nhà")) {
                         actualNeeds += amount;
