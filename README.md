@@ -47,6 +47,8 @@ Mã nguồn được tổ chức chặt chẽ theo mô hình **MVC (Model - View
 3. **Chạy ứng dụng:**
 * Chạy file `Main.java` (Nằm ở thư mục gốc) để bắt đầu.
 
-
 ## 📸 Ảnh chụp màn hình (Screenshots)
-![alt text](image.png) ![alt text](image-1.png) ![alt text](image-2.png) ![alt text](image-3.png)
+![Màn hình Đăng nhập/Đăng ký](images/login.png)
+![Màn hình Quản lý Thu Chi](images/tab1.png)
+![Màn hình Phân tích Biểu đồ](images/tab2.png)
+![Màn hình Cố vấn AI](images/tab3.png)
