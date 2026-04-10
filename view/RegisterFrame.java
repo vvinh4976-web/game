@@ -53,7 +53,7 @@ public class RegisterFrame extends JFrame {
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         btnPanel.setBackground(new Color(18, 18, 18));
-btnPanel.setBorder(new EmptyBorder(25, 0, 0, 0));
+        btnPanel.setBorder(new EmptyBorder(25, 0, 0, 0));
 
         JButton btnRegister = new JButton("ĐĂNG KÝ");
         btnRegister.setBackground(new Color(52, 172, 224)); btnRegister.setForeground(Color.WHITE); btnRegister.setFont(new Font("Segoe UI", Font.BOLD, 14));
