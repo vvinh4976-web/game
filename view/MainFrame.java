@@ -7,11 +7,10 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentListener;// của ý
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -54,7 +53,7 @@ public class MainFrame extends JFrame {
         try { UIManager.setLookAndFeel(new FlatDarkLaf()); } catch (Exception ex) {}
         initUI();
         loadDataToTable();
-        updateChart(); 
+        updateChart(); // hàm của Ý
     }
 
     private void initUI() {
@@ -126,7 +125,7 @@ public class MainFrame extends JFrame {
         String[] columns = {"ID", "So Tien", "Danh Muc", "Ngay Giao Dich", "Ghi Chu"};
         tableModel = new DefaultTableModel(columns, 0); table = new JTable(tableModel);
         rowSorter = new TableRowSorter<>(tableModel); table.setRowSorter(rowSorter);
-
+// hàm tìm kiếm của Ý
         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { search(txtSearch.getText()); }
             public void removeUpdate(DocumentEvent e) { search(txtSearch.getText()); }
@@ -136,7 +135,7 @@ public class MainFrame extends JFrame {
                 else rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + str));
             }
         });
-
+// Hiền design
         table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
@@ -326,7 +325,7 @@ public class MainFrame extends JFrame {
 
         ChartPanel chartPanel = new ChartPanel(chart); chartPanel.setBackground(COLOR_BG); 
         chartContainer.removeAll(); chartContainer.add(chartPanel, BorderLayout.CENTER); chartContainer.revalidate();
-        
+        // // Ý giải thích: "Em dùng Timer của Swing, cứ 15 mili-giây thì cho biểu đồ quay thêm 5 độ cho đến khi đủ 360 độ"
         if (chartTimer != null && chartTimer.isRunning()) chartTimer.stop();
         final double[] currentAngle = {0.0}; plot.setLabelGenerator(null); 
         chartTimer = new Timer(15, e -> { 
