@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Map;
 import model.Transaction;
 import utils.DBConnection;
+
 public class TransactionController {
+    
+    // 👉 [PHẦN CỦA VINH]: Hàm nòng cốt. Vinh dùng SQL "SELECT *" để lấy toàn bộ dữ liệu 
+    // từ MySQL lên, sau đó Hiền sẽ dùng danh sách này để đổ vào bảng JTable ở Tab 1.
     /**
      * Hàm lấy toàn bộ danh sách giao dịch từ Database.
      * @return List danh sách các đối tượng Transaction.
@@ -35,12 +39,13 @@ public class TransactionController {
         return list;
     }
 
+    // 👉 [PHẦN CỦA VINH]: Xử lý logic Lưu dữ liệu. Vinh dùng PreparedStatement (có dấu ?)
+    // để chèn dữ liệu mà Hiền thu thập từ giao diện (Tab 1) xuống Database an toàn.
     /**
      * Hàm thêm một giao dịch mới vào Database.
      * @param t Đối tượng giao dịch cần thêm.
      * @return true nếu thêm thành công, false nếu thất bại.
      */ 
-    // vinh
     public boolean addTransaction(Transaction t) {
         String sql = "INSERT INTO transactions (amount, category, note, transaction_date) VALUES (?, ?, ?, CURDATE())";
         
@@ -59,6 +64,7 @@ public class TransactionController {
         }
     }
 
+    // 👉 [PHẦN CỦA VINH]: Xử lý logic Xóa dòng trong Database dựa vào ID.
     /**
      * Hàm xóa một giao dịch dựa trên ID.
      * @param id Mã định danh của giao dịch.
@@ -79,6 +85,9 @@ public class TransactionController {
         }
     }
 
+    // 👉 [PHẦN CỦA VINH (Viết logic) & Ý (Sử dụng)]: 
+    // Vinh viết thuật toán duyệt mảng này để lọc ra Tổng Thu và Tổng Chi, 
+    // sau đó trả dữ liệu về để Ý đưa vào biểu đồ hoặc Hiền đưa lên nhãn Label.
     /**
      * Hàm lấy dữ liệu để vẽ biểu đồ (Dành cho Ý)
      * Giả sử: Danh mục "Lương" hoặc "Thưởng" là THU. Còn lại là CHI.
@@ -98,6 +107,11 @@ public class TransactionController {
         }
         return new double[]{totalThu, totalChi};
     }
+
+    // 👉 [PHẦN CỦA VINH (Viết logic) & Ý (Sử dụng)]: 
+    // Thay vì bắt Ý phải tự viết câu lệnh SQL "GROUP BY" phức tạp trên giao diện, 
+    // Vinh đóng vai trò Backend gộp sẵn tiền theo từng danh mục (như Thuật toán Map-Reduce). 
+    // Ý chỉ việc gọi hàm này để lấy cục Map<String, Double> nhét thẳng vào biểu đồ Donut JFreeChart.
     /**
      * Hàm lấy dữ liệu gom nhóm theo từng Danh mục để Ý vẽ biểu đồ Donut nhiều màu.
      * Hàm này sẽ tự động phân tích: Ví dụ có 3 khoản "Ăn uống" nó sẽ tự cộng dồn lại thành 1 cục.
